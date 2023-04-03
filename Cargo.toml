@@ -1,0 +1,6 @@
+## Warehouse
+[workspace]
+
+members = [
+    "ims"
+]

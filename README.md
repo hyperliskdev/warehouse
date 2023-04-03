@@ -19,4 +19,4 @@ Step 3. Authentication
 
 Step 4. Data streaming and logging
 
-  This section is about compiling all the order and selling data into infomation companies can use to have the best supply chain information.
+This section is about compiling all the order and selling data into infomation companies can use to have the best supply chain information.
