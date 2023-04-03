@@ -1,0 +1,19 @@
+[package]
+name = "ims"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+actix-web = "*"
+
+sqlx = { version = "*", features = [ "postgres", "macros", "chrono", "json", "uuid", "runtime-actix-rustls" ]}
+async-graphql = { version = "*", features = [ "chrono", "log", "tracing", "uuid", "dataloader" ] }
+async-graphql-actix-web = { version = "*", features = [] }
+
+serde = { version = "*", features = [ "derive" ] }
+
+uuid = "*"
+chrono = "*"
+
