@@ -1,6 +1,5 @@
-## Warehouse
 [workspace]
 
 members = [
-    "ims"
+    "ims",
 ]
