@@ -2,13 +2,10 @@
 use async_graphql::*;
 
 use crate::objects::{piece::Piece, location::Location};
-
-
 pub type InventorySchema = Schema<IMSQuery, IMSMutation, EmptySubscription>;
 
+#[derive(Default)]
 pub struct IMSQuery;
-
-
 
 
 #[Object]

@@ -1,22 +1,44 @@
 // Locations contain Pieces
 
-use async_graphql::Object;
+use std::{sync::Arc, collections::HashMap};
+
+use async_graphql::{Object, Context};
+use sqlx::{PgPool, Pool, Postgres};
+use uuid::Uuid;
 
 #[derive(Clone, Debug, Default)]
 pub struct Location {
     id: i32,
+    location_code: Uuid,
     name: String,
 }
 
 #[Object]
 impl Location {
-    async fn id(&self) -> i32 {
-        self.id
+    async fn id(&self, ctx: &Context<'_>) -> Result<i32, sqlx::Error> {
+        let pool = ctx.data_unchecked::<Pool<Postgres>>();
+        let (id,): (i32,) = sqlx::query_as("SELECT id FROM locations WHERE id = $1")
+            .bind(self.id)
+            .fetch_one(pool)
+            .await?;
+        Ok(id)
     }
 
-    async fn name(&self) -> &str {
-        &self.name
+    async fn location_code(&self, ctx: &Context<'_>) -> Result<Uuid, sqlx::Error> {
+        let pool = ctx.data_unchecked::<Pool<Postgres>>();
+        let (location_code,): (Uuid,) = sqlx::query_as("SELECT location_code FROM locations WHERE id = $1")
+            .bind(self.id)
+            .fetch_one(pool)
+            .await?;
+        Ok(location_code)
+    }
+
+    async fn name(&self, ctx: &Context<'_>) -> Result<String, sqlx::Error> {
+        let pool = ctx.data_unchecked::<Pool<Postgres>>();
+        let (name,): (String,) = sqlx::query_as("SELECT name FROM locations WHERE id = $1")
+            .bind(self.id)
+            .fetch_one(pool)
+            .await?;
+        Ok(name)
     }
 }
-
-// LocationLoader
