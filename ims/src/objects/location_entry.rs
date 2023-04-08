@@ -1,10 +1,12 @@
-use async_graphql::{Context, Object};
+use std::collections::HashMap;
+
+use async_graphql::{Context, Object, async_trait, FieldError, dataloader::{Loader, DataLoader}, futures_util::TryStreamExt, InputObject};
 use sqlx::{Postgres, Pool};
 
 
 
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, sqlx::FromRow)]
 pub struct LocationEntry {
     pub id: i32,
     pub location_id: i32,
@@ -18,40 +20,83 @@ pub struct LocationEntry {
 #[Object]
 impl LocationEntry {
 
-    async fn id(&self, ctx: &Context<'_>) -> Result<i32, sqlx::Error> {
-        let pool = ctx.data_unchecked::<Pool<Postgres>>();
-        let (id,): (i32,) = sqlx::query_as("SELECT id FROM ims.location_entries WHERE id = $1")
-            .bind(self.id)
-            .fetch_one(pool)
-            .await?;
-        Ok(id)
+    async fn id(&self, ctx: &Context<'_>) -> Result<i32, FieldError> {
+        let loader = ctx.data_unchecked::<DataLoader<LocationEntryLoader>>();
+        let locEntry = loader.load_one(self.id).await?;
+
+        if let Some(locEntry) = locEntry {
+            Ok(locEntry.id)
+        } else {
+            Err(FieldError::new("LocationEntry not found"))
+        }
     }
 
-    async fn location_id(&self, ctx: &Context<'_>) -> Result<i32, sqlx::Error> {
-        let pool = ctx.data_unchecked::<Pool<Postgres>>();
-        let (location_id,): (i32,) = sqlx::query_as("SELECT location_id FROM ims.location_entries WHERE id = $1")
-            .bind(self.id)
-            .fetch_one(pool)
-            .await?;
-        Ok(location_id)
+    async fn location_id(&self, ctx: &Context<'_>) -> Result<i32, FieldError> {
+        let loader = ctx.data_unchecked::<DataLoader<LocationEntryLoader>>();
+        let locEntry = loader.load_one(self.id).await?;
+
+        if let Some(locEntry) = locEntry {
+            Ok(locEntry.location_id)
+        } else {
+            Err(FieldError::new("LocationEntry not found"))
+        }
     }
 
-    async fn piece_id(&self, ctx: &Context<'_>) -> Result<i32, sqlx::Error> {
-        let pool = ctx.data_unchecked::<Pool<Postgres>>();
-        let (piece_id,): (i32,) = sqlx::query_as("SELECT piece_id FROM ims.location_entries WHERE id = $1")
-            .bind(self.id)
-            .fetch_one(pool)
-            .await?;
-        Ok(piece_id)
+    async fn piece_id(&self, ctx: &Context<'_>) -> Result<i32, FieldError> {
+        let loader = ctx.data_unchecked::<DataLoader<LocationEntryLoader>>();
+        let locEntry = loader.load_one(self.id).await?;
+
+        if let Some(locEntry) = locEntry {
+            Ok(locEntry.piece_id)
+        } else {
+            Err(FieldError::new("LocationEntry not found"))
+        }
     }
 
-    async fn quantity(&self, ctx: &Context<'_>) -> Result<i32, sqlx::Error> {
-        let pool = ctx.data_unchecked::<Pool<Postgres>>();
-        let (quantity,): (i32,) = sqlx::query_as("SELECT quantity FROM ims.location_entries WHERE id = $1")
-            .bind(self.id)
-            .fetch_one(pool)
-            .await?;
-        Ok(quantity)
+    async fn quantity(&self, ctx: &Context<'_>) -> Result<i32, FieldError> {
+        let loader = ctx.data_unchecked::<DataLoader<LocationEntryLoader>>();
+        let locEntry = loader.load_one(self.id).await?;
+
+        if let Some(locEntry) = locEntry {
+            Ok(locEntry.quantity)
+        } else {
+            Err(FieldError::new("LocationEntry not found"))
+        }
     }
 
+}
+
+#[derive(Clone, Debug, Default, InputObject)]
+pub struct InputLocationEntry {
+    pub location_id: i32,
+    pub piece_id: i32,
+    pub quantity: i32,
+    pub unit: i32,
+}
+
+pub struct LocationEntryLoader {
+    pool: Pool<Postgres>,
+}
+
+impl LocationEntryLoader {
+    pub fn new(pool: Pool<Postgres>) -> Self {
+        Self { pool }
+    }
+}
+
+#[async_trait::async_trait]
+impl Loader<i32> for LocationEntryLoader {
+    type Value = LocationEntry;
+    type Error = FieldError;
+
+    async fn load(&self, keys: &[i32]) -> Result<HashMap<i32, Self::Value>, Self::Error> {
+        Ok(
+            sqlx::query_as("SELECT * FROM ims.location_entries WHERE id = ANY($1)")
+                .bind(keys)
+                .fetch(&self.pool)
+                .map_ok(|locEntry: LocationEntry| (locEntry.id, locEntry))
+                .try_collect()
+                .await?
+        )
+    }
 }
