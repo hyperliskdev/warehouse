@@ -20,11 +20,21 @@ impl PieceCategory {
         Ok(id)
     }
     
-    async fn title(&self) -> &str {
-        &self.title
+    async fn title(&self, ctx: &Context<'_>) -> Result<String, sqlx::Error> {
+        let pool = ctx.data_unchecked::<Pool<Postgres>>();
+        let (title,): (String,) = sqlx::query_as("SELECT title FROM piece_category WHERE id = $1")
+            .bind(self.id)
+            .fetch_one(pool)
+            .await?;
+        Ok(title)
     }
 
-    async fn desc(&self) -> &str {
-        &self.desc
+    async fn desc(&self, ctx: &Context<'_>) -> Result<String, sqlx::Error> {
+        let pool = ctx.data_unchecked::<Pool<Postgres>>();
+        let (desc,): (String,) = sqlx::query_as("SELECT desc FROM piece_category WHERE id = $1")
+            .bind(self.id)
+            .fetch_one(pool)
+            .await?;
+        Ok(desc)
     }
 }
