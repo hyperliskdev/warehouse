@@ -8,9 +8,10 @@ edition = "2021"
 [dependencies]
 actix-web = "*"
 
-sqlx = { version = "*", features = [ "postgres", "macros", "chrono", "json", "uuid", "runtime-actix-rustls" ]}
+sqlx-cli = { version = "*" }
+sqlx = { version = "*", features = [ "postgres", "macros", "chrono", "json", "uuid", "runtime-actix-native-tls" ]}
 async-graphql = { version = "*", features = [ "chrono", "log", "tracing", "uuid", "dataloader" ] }
-async-graphql-actix-web = { version = "*", features = [] }
+async-graphql-actix-web = { version = "*"}
 
 serde = { version = "*", features = [ "derive" ] }
 

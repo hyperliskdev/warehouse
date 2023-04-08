@@ -28,7 +28,7 @@ async fn main() -> std::io::Result<()> {
         .data(
             sqlx::postgres::PgPoolOptions::new()
                 .max_connections(5)
-                .connect("postgres://postgres:postgres@localhost:5432/ims")
+                .connect("postgres://postgres:hyperlisk@localhost:5432/warehouse")
                 .await
                 .unwrap(),
         )

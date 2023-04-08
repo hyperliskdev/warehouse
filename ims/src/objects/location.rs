@@ -10,7 +10,7 @@ use uuid::Uuid;
 pub struct Location {
     id: i32,
     location_code: Uuid,
-    name: String,
+    title: String,
 }
 
 #[Object]
@@ -33,12 +33,15 @@ impl Location {
         Ok(location_code)
     }
 
-    async fn name(&self, ctx: &Context<'_>) -> Result<String, sqlx::Error> {
+    async fn title(&self, ctx: &Context<'_>) -> Result<String, sqlx::Error> {
         let pool = ctx.data_unchecked::<Pool<Postgres>>();
-        let (name,): (String,) = sqlx::query_as("SELECT name FROM locations WHERE id = $1")
+        let (title,): (String,) = sqlx::query_as("SELECT title FROM locations WHERE id = $1")
             .bind(self.id)
             .fetch_one(pool)
             .await?;
-        Ok(name)
+        Ok(title)
     }
 }
+
+
+
