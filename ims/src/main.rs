@@ -1,16 +1,14 @@
-mod schema;
 mod objects;
+mod schema;
 
 use actix_web::{guard, web, web::Data, App, HttpResponse, HttpServer, Result};
-use async_graphql::{http::GraphiQLSource, EmptySubscription, Schema};
+use async_graphql::{http::GraphiQLSource, EmptySubscription, MergedObject, Schema};
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
-use schema::InventorySchema;
+use objects::ObjectQuery;
+use schema::IMSSchema;
+use crate::schema::{IMSMutation, IMSQuery};
 
-use crate::schema::{IMSQuery, IMSMutation};
-
-
-
-async fn index(schema: web::Data<InventorySchema>, req: GraphQLRequest) -> GraphQLResponse {
+async fn index(schema: web::Data<IMSSchema>, req: GraphQLRequest) -> GraphQLResponse {
     schema.execute(req.into_inner()).await.into()
 }
 
@@ -22,7 +20,6 @@ async fn index_graphiql() -> Result<HttpResponse> {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-
     let schema = Schema::build(IMSQuery, IMSMutation, EmptySubscription)
         .enable_federation()
         .data(
