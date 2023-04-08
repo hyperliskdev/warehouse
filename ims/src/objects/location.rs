@@ -3,7 +3,7 @@
 use std::{sync::Arc, collections::HashMap};
 
 use async_graphql::{Object,
-Context, InputObject, async_trait, futures_util::TryStreamExt, dataloader::Loader};
+Context, InputObject, async_trait, futures_util::TryStreamExt, dataloader::{Loader, DataLoader}, FieldError, parser::types::Field};
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 
@@ -20,58 +20,71 @@ pub struct Location {
 
 #[Object]
 impl Location {
-    async fn id(&self, ctx: &Context<'_>) -> Result<i32, sqlx::Error> {
-        let pool = ctx.data_unchecked::<Pool<Postgres>>();
-        let (id,): (i32,) = sqlx::query_as("SELECT id FROM ims.locations WHERE id = $1")
-            .bind(self.id)
-            .fetch_one(pool)
-            .await?;
-        Ok(id)
+    async fn id(&self, ctx: &Context<'_>) -> Result<i32, FieldError> {
+        let loader = ctx.data_unchecked::<DataLoader<LocationLoader>>();
+        let loc = loader.load_one(self.id).await?;
+
+        if let Some(loc) = loc {
+            Ok(loc.id)
+        } else {
+            Err(FieldError::new("Location not found"))
+        }
     }
 
-    async fn code(&self, ctx: &Context<'_>) -> Result<Uuid, sqlx::Error> {
-        let pool = ctx.data_unchecked::<Pool<Postgres>>();
-        let (location_code,): (Uuid,) = sqlx::query_as("SELECT code FROM ims.locations WHERE id = $1")
-            .bind(self.id)
-            .fetch_one(pool)
-            .await?;
-        Ok(location_code)
+    async fn code(&self, ctx: &Context<'_>) -> Result<Uuid, FieldError> {
+        let loader = ctx.data_unchecked::<DataLoader<LocationLoader>>();
+        let loc = loader.load_one(self.id).await?;
+
+        if let Some(loc) = loc {
+            Ok(loc.code)
+        } else {
+            Err(FieldError::new("Location not found"))
+        }
     }
 
-    async fn title(&self, ctx: &Context<'_>) -> Result<String, sqlx::Error> {
-        let pool = ctx.data_unchecked::<Pool<Postgres>>();
-        let (title,): (String,) = sqlx::query_as("SELECT title FROM ims.locations WHERE id = $1")
-            .bind(self.id)
-            .fetch_one(pool)
-            .await?;
-        Ok(title)
+    async fn title(&self, ctx: &Context<'_>) -> Result<String, FieldError> {
+        let loader = ctx.data_unchecked::<DataLoader<LocationLoader>>();
+        let loc = loader.load_one(self.id).await?;
+
+        if let Some(loc) = loc {
+            Ok(loc.title)
+        } else {
+            Err(FieldError::new("Location not found"))
+        }
+        
     }
 
-    async fn description(&self, ctx: &Context<'_>) -> Result<Option<String>, sqlx::Error> {
-        let pool = ctx.data_unchecked::<Pool<Postgres>>();
-        let (description,): (Option<String>,) = sqlx::query_as("SELECT description FROM ims.locations WHERE id = $1")
-            .bind(self.id)
-            .fetch_one(pool)
-            .await?;
-        Ok(description)
+    async fn description(&self, ctx: &Context<'_>) -> Result<Option<String>, FieldError> {
+        let loader = ctx.data_unchecked::<DataLoader<LocationLoader>>();
+        let loc = loader.load_one(self.id).await?;
+
+        if let Some(loc) = loc {
+            Ok(loc.description)
+        } else {
+            Err(FieldError::new("Location not found"))
+        }
     }
 
-    async fn created_at(&self, ctx: &Context<'_>) -> Result<chrono::NaiveDateTime, sqlx::Error> {
-        let pool = ctx.data_unchecked::<Pool<Postgres>>();
-        let (created_at,): (chrono::NaiveDateTime,) = sqlx::query_as("SELECT created_at FROM ims.locations WHERE id = $1")
-            .bind(self.id)
-            .fetch_one(pool)
-            .await?;
-        Ok(created_at)
+    async fn created_at(&self, ctx: &Context<'_>) -> Result<chrono::NaiveDateTime, FieldError> {
+        let loader = ctx.data_unchecked::<DataLoader<LocationLoader>>();
+        let loc = loader.load_one(self.id).await?;
+
+        if let Some(loc) = loc {
+            Ok(loc.created_at)
+        } else {
+            Err(FieldError::new("Location not found"))
+        }
     }
 
-    async fn updated_at(&self, ctx: &Context<'_>) -> Result<chrono::NaiveDateTime, sqlx::Error> {
-        let pool = ctx.data_unchecked::<Pool<Postgres>>();
-        let (updated_at,): (chrono::NaiveDateTime,) = sqlx::query_as("SELECT updated_at FROM ims.locations WHERE id = $1")
-            .bind(self.id)
-            .fetch_one(pool)
-            .await?;
-        Ok(updated_at)
+    async fn updated_at(&self, ctx: &Context<'_>) -> Result<chrono::NaiveDateTime, FieldError> {
+        let loader = ctx.data_unchecked::<DataLoader<LocationLoader>>();
+        let loc = loader.load_one(self.id).await?;
+
+        if let Some(loc) = loc {
+            Ok(loc.updated_at)
+        } else {
+            Err(FieldError::new("Location not found"))
+        }
     }
 
 }
@@ -86,14 +99,22 @@ pub struct LocationLoader {
     pool: sqlx::PgPool,
 }
 
+impl LocationLoader {
+    pub fn new(pool: sqlx::PgPool) -> Self {
+        Self { pool }
+    }
+}
+
 #[async_trait::async_trait]
 impl Loader<i32> for LocationLoader {
     type Value = Location;
-    type Error = Arc<sqlx::Error>;
+    type Error = FieldError;
 
     async fn load(&self, keys: &[i32]) -> Result<HashMap<i32, Self::Value>, Self::Error> {
+
+
         Ok(
-            sqlx::query_as("SELECT * FROM locations WHERE id = ANY($1)")
+            sqlx::query_as("SELECT * FROM ims.locations WHERE id = ANY($1)")
                 .bind(keys)
                 .fetch(&self.pool)
                 .map_ok(|loc: Location| (loc.id, loc))

@@ -1,12 +1,12 @@
 mod objects;
 mod schema;
 
-use actix_web::{guard, web, web::Data, App, HttpResponse, HttpServer, Result};
-use async_graphql::{http::GraphiQLSource, EmptySubscription, MergedObject, Schema};
+use actix_web::{guard, web, web::Data, App, HttpResponse, HttpServer, Result, rt::spawn};
+use async_graphql::{http::GraphiQLSource, EmptySubscription, MergedObject, Schema, dataloader::DataLoader};
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
 use objects::ObjectQuery;
 use schema::IMSSchema;
-use crate::schema::{IMSMutation, IMSQuery};
+use crate::{schema::{IMSMutation, IMSQuery}, objects::location::LocationLoader};
 
 async fn index(schema: web::Data<IMSSchema>, req: GraphQLRequest) -> GraphQLResponse {
     schema.execute(req.into_inner()).await.into()
@@ -20,16 +20,21 @@ async fn index_graphiql() -> Result<HttpResponse> {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+
+    let pg_pool = sqlx::postgres::PgPoolOptions::new()
+    .max_connections(5)
+    .connect("postgres://postgres:hyperlisk@localhost:5432/warehouse")
+    .await
+    .unwrap();
+
     let schema = Schema::build(IMSQuery, IMSMutation, EmptySubscription)
         .enable_federation()
-        .data(
-            sqlx::postgres::PgPoolOptions::new()
-                .max_connections(5)
-                .connect("postgres://postgres:hyperlisk@localhost:5432/warehouse")
-                .await
-                .unwrap(),
+        .data( pg_pool.clone()
         )
-        // .data(DataLoader::new(LocationLoader, async_std::task::spawn))
+        .data(
+            DataLoader::new(
+                LocationLoader::new(pg_pool), spawn)
+        )
         .finish();
 
     println!("GraphiQL IDE: http://localhost:8000");
