@@ -1,5 +1,6 @@
 
 use async_graphql::*;
+use sqlx::{Postgres, Pool};
 
 use crate::objects::{piece::Piece, location::Location};
 pub type InventorySchema = Schema<IMSQuery, IMSMutation, EmptySubscription>;
@@ -11,8 +12,14 @@ pub struct IMSQuery;
 #[Object]
 impl IMSQuery {
     pub async fn get_piece(&self, ctx: &Context<'_>, id: i32) -> Result<Piece> {
-        // Get a piece from the database by id
-        todo!{}
+        let pool = ctx.data_unchecked::<Pool<Postgres>>();
+
+        let piece = sqlx::query_as!(Piece, "SELECT * FROM ims.pieces WHERE id = $1", id)
+            .fetch_one(pool)
+            .await?;
+
+        todo!()
+
     }
 
     pub async fn get_location(&self, ctx: &Context<'_>, id: i32) -> Result<Location> {

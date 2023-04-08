@@ -6,10 +6,13 @@ use sqlx::{Postgres, Pool};
 
 #[derive(Clone, Debug, Default)]
 pub struct LocationEntry {
-    id: i32,
-    location_id: i32,
-    piece_id: i32,
-    quantity: i32,
+    pub id: i32,
+    pub location_id: i32,
+    pub piece_id: i32,
+    pub quantity: i32,
+    pub unit: i32,
+    pub created_at: chrono::NaiveDateTime,
+    pub updated_at: chrono::NaiveDateTime,
 }
 
 #[Object]

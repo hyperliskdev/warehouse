@@ -5,6 +5,10 @@ CREATE TABLE IF NOT EXISTS ims.piece_categories
     id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
     description TEXT NOT NULL
+
+    -- Dates strictly for tracked in PostgreSQL --
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS ims.pieces 

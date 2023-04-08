@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS pieces
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     piece_code UUID NOT NULL,
     name TEXT NOT NULL,
-    description TEXT NOT NULL,
+    description TEXT NULL,
     category INTEGER NOT NULL,
 
     -- Dates strictly for tracked in PostgreSQL --

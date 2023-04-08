@@ -4,9 +4,11 @@ use sqlx::{Postgres, Pool};
 
 
 pub struct PieceCategory {
-    id: i32,
-    title: String,
-    desc: String,
+    pub id: i32,
+    pub title: String,
+    pub description: String,
+    pub created_at: chrono::NaiveDateTime,
+    pub updated_at: chrono::NaiveDateTime,
 }
 
 #[Object]

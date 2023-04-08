@@ -8,9 +8,13 @@ use uuid::Uuid;
 
 #[derive(Clone, Debug, Default)]
 pub struct Location {
-    id: i32,
-    location_code: Uuid,
-    title: String,
+    pub id: i32,
+    pub location_code: Uuid,
+    pub title: String,
+    pub description: Option<String>,
+    
+    pub created_at: chrono::NaiveDateTime,
+    pub updated_at: chrono::NaiveDateTime,
 }
 
 #[Object]

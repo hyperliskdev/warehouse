@@ -6,10 +6,14 @@ use uuid::Uuid;
 
 #[derive(Clone, Debug, Default)]
 pub struct Piece {
-    id: i32,
-    piece_code: Uuid,
-    name: String,
-    category: i32,
+    pub id: i32,
+    pub piece_code: Uuid,
+    pub name: String,
+    pub description: String,
+    pub category: i32,
+
+    pub created_at: chrono::NaiveDateTime,
+    pub updated_at: chrono::NaiveDateTime,
 }
 
 
