@@ -31,8 +31,6 @@ impl Piece {
         } else {
             Err(FieldError::new("Piece not found"))
         }
-
-
     }
 
     async fn code(&self, ctx: &Context<'_>) -> Result<Uuid, FieldError> {

@@ -4,7 +4,6 @@ mod schema;
 use actix_web::{guard, web, web::Data, App, HttpResponse, HttpServer, Result, rt::spawn};
 use async_graphql::{http::GraphiQLSource, EmptySubscription, MergedObject, Schema, dataloader::DataLoader};
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
-use objects::ObjectQuery;
 use schema::IMSSchema;
 use crate::{schema::{IMSMutation, IMSQuery}, objects::location::LocationLoader};
 

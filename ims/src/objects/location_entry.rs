@@ -94,7 +94,7 @@ impl Loader<i32> for LocationEntryLoader {
             sqlx::query_as("SELECT * FROM ims.location_entries WHERE id = ANY($1)")
                 .bind(keys)
                 .fetch(&self.pool)
-                .map_ok(|locEntry: LocationEntry| (locEntry.id, locEntry))
+                .map_ok(|loc_entry: LocationEntry| (loc_entry.id, loc_entry))
                 .try_collect()
                 .await?
         )

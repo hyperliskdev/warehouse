@@ -111,8 +111,6 @@ impl Loader<i32> for LocationLoader {
     type Error = FieldError;
 
     async fn load(&self, keys: &[i32]) -> Result<HashMap<i32, Self::Value>, Self::Error> {
-
-
         Ok(
             sqlx::query_as("SELECT * FROM ims.locations WHERE id = ANY($1)")
                 .bind(keys)
