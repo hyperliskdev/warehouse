@@ -1,14 +1,12 @@
-
 CREATE SCHEMA IF NOT EXISTS ims;
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
 
 CREATE TABLE IF NOT EXISTS ims.piece_categories 
 (
     id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
-    description TEXT NOT NULL,
+    description TEXT NULL,
 
     -- Dates strictly for tracked in PostgreSQL --
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -21,7 +19,7 @@ CREATE TABLE IF NOT EXISTS ims.pieces
     code UUID UNIQUE NOT NULL DEFAULT uuid_generate_v4(),
     name TEXT NOT NULL,
     description TEXT NULL,
-    category INTEGER NOT NULL,
+    category INTEGER NULL,
 
     -- Dates strictly for tracked in PostgreSQL --
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -41,15 +39,28 @@ CREATE TABLE IF NOT EXISTS ims.locations
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS ims.units
+(
+    id SERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    short TEXT NOT NULL,
+    description TEXT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
 CREATE TABLE IF NOT EXISTS ims.location_entries
 (
     id SERIAL PRIMARY KEY,
     location_id INTEGER NOT NULL,
     piece_id INTEGER NOT NULL,
+    quantity INTEGER NOT NULL,
+    unit INTEGER NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (location_id) REFERENCES ims.locations(id),
-    FOREIGN KEY (piece_id) REFERENCES ims.pieces(id)
+    FOREIGN KEY (piece_id) REFERENCES ims.pieces(id),
+    FOREIGN KEY (unit) REFERENCES ims.units(id)
 );
 
 -- Path: migrations\20230407201221_dev-migration-01-basic.sql

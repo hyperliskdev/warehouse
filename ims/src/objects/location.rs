@@ -1,10 +1,9 @@
 // Locations contain Pieces
 
-use std::{sync::Arc, collections::HashMap};
+use std::{collections::HashMap};
 
 use async_graphql::{Object,
-Context, InputObject, async_trait, futures_util::TryStreamExt, dataloader::{Loader, DataLoader}, FieldError, parser::types::Field};
-use sqlx::{Pool, Postgres};
+Context, InputObject, async_trait, futures_util::TryStreamExt, dataloader::{Loader, DataLoader}, FieldError};
 use uuid::Uuid;
 
 #[derive(Clone, Debug, Default, sqlx::FromRow)]

@@ -22,10 +22,10 @@ impl LocationEntry {
 
     async fn id(&self, ctx: &Context<'_>) -> Result<i32, FieldError> {
         let loader = ctx.data_unchecked::<DataLoader<LocationEntryLoader>>();
-        let locEntry = loader.load_one(self.id).await?;
+        let loc_entry = loader.load_one(self.id).await?;
 
-        if let Some(locEntry) = locEntry {
-            Ok(locEntry.id)
+        if let Some(loc_entry) = loc_entry {
+            Ok(loc_entry.id)
         } else {
             Err(FieldError::new("LocationEntry not found"))
         }
@@ -33,10 +33,10 @@ impl LocationEntry {
 
     async fn location_id(&self, ctx: &Context<'_>) -> Result<i32, FieldError> {
         let loader = ctx.data_unchecked::<DataLoader<LocationEntryLoader>>();
-        let locEntry = loader.load_one(self.id).await?;
+        let loc_entry = loader.load_one(self.id).await?;
 
-        if let Some(locEntry) = locEntry {
-            Ok(locEntry.location_id)
+        if let Some(loc_entry) = loc_entry {
+            Ok(loc_entry.location_id)
         } else {
             Err(FieldError::new("LocationEntry not found"))
         }
@@ -44,10 +44,10 @@ impl LocationEntry {
 
     async fn piece_id(&self, ctx: &Context<'_>) -> Result<i32, FieldError> {
         let loader = ctx.data_unchecked::<DataLoader<LocationEntryLoader>>();
-        let locEntry = loader.load_one(self.id).await?;
+        let loc_entry = loader.load_one(self.id).await?;
 
-        if let Some(locEntry) = locEntry {
-            Ok(locEntry.piece_id)
+        if let Some(loc_entry) = loc_entry {
+            Ok(loc_entry.piece_id)
         } else {
             Err(FieldError::new("LocationEntry not found"))
         }
@@ -55,10 +55,10 @@ impl LocationEntry {
 
     async fn quantity(&self, ctx: &Context<'_>) -> Result<i32, FieldError> {
         let loader = ctx.data_unchecked::<DataLoader<LocationEntryLoader>>();
-        let locEntry = loader.load_one(self.id).await?;
+        let loc_entry = loader.load_one(self.id).await?;
 
-        if let Some(locEntry) = locEntry {
-            Ok(locEntry.quantity)
+        if let Some(loc_entry) = loc_entry {
+            Ok(loc_entry.quantity)
         } else {
             Err(FieldError::new("LocationEntry not found"))
         }

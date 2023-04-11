@@ -3,7 +3,6 @@
 use std::collections::HashMap;
 
 use async_graphql::{Object, Context, InputObject, futures_util::TryStreamExt, async_trait, FieldError, dataloader::DataLoader};
-use sqlx::{Postgres, Pool};
 use uuid::Uuid;
 
 #[derive(Clone, Debug, Default, sqlx::FromRow)]
@@ -12,7 +11,7 @@ pub struct Piece {
     pub code: Uuid,
     pub name: String,
     pub description: Option<String>,
-    pub category: i32,
+    pub category: Option<i32>,
 
     pub created_at: chrono::NaiveDateTime,
     pub updated_at: chrono::NaiveDateTime,
@@ -76,7 +75,11 @@ impl Piece {
         let p = loader.load_one(self.id).await?;
 
         if let Some(p) = p {
-            Ok(p.category)
+            if let Some(category) = p.category {
+                Ok(category)
+            } else {
+                Err(FieldError::new("This piece has no category"))
+            }
         } else {
             Err(FieldError::new("Piece not found"))
         }
@@ -110,7 +113,7 @@ impl Piece {
 pub struct InputPiece {
     pub name: String,
     pub description: Option<String>,
-    pub category: i32,
+    pub category: Option<i32>,
 }
 
 pub struct PieceLoader {
