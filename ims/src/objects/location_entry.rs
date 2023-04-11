@@ -3,9 +3,6 @@ use std::collections::HashMap;
 use async_graphql::{Context, Object, async_trait, FieldError, dataloader::{Loader, DataLoader}, futures_util::TryStreamExt, InputObject};
 use sqlx::{Postgres, Pool};
 
-
-
-
 #[derive(Clone, Debug, Default, sqlx::FromRow)]
 pub struct LocationEntry {
     pub id: i32,

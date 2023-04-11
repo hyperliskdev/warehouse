@@ -83,8 +83,6 @@ impl UnitLoader {
     }
 }
 
-
-
 #[async_trait::async_trait]
 impl Loader<i32> for UnitLoader {
     type Value = Unit;

@@ -133,7 +133,7 @@ impl async_graphql::dataloader::Loader<i32> for PieceLoader {
 
     async fn load(&self, keys: &[i32]) -> Result<HashMap<i32, Self::Value>, Self::Error> {
         Ok(
-            sqlx::query_as("SELECT * FROM ims.locations WHERE id = ANY($1)")
+            sqlx::query_as("SELECT * FROM ims.pieces WHERE id = ANY($1)")
                 .bind(keys)
                 .fetch(&self.pool)
                 .map_ok(|p: Piece| (p.id, p))

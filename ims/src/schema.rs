@@ -139,9 +139,6 @@ impl IMSMutation {
         let pool = ctx.data_unchecked::<Pool<Postgres>>();
         let loader = ctx.data_unchecked::<DataLoader<LocationEntryLoader>>();
 
-
-
-
         // Create the new location entry
         let location_entry = sqlx::query_as!(
             LocationEntry,
