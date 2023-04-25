@@ -12,7 +12,6 @@ pub struct Piece {
     pub name: String,
     pub description: Option<String>,
     pub category: Option<i32>,
-
     pub created_at: chrono::NaiveDateTime,
     pub updated_at: chrono::NaiveDateTime,
 }

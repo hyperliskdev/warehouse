@@ -18,10 +18,10 @@ pub struct Unit {
 impl Unit {
     async fn id(&self, ctx: &Context<'_>) -> Result<i32, FieldError> {
         let loader = ctx.data_unchecked::<DataLoader<UnitLoader>>();
-        let p = loader.load_one(self.id).await?;
+        let u = loader.load_one(self.id).await?;
 
-        if let Some(p) = p {
-            Ok(p.id)
+        if let Some(u) = u {
+            Ok(u.id)
         } else {
             Err(FieldError::new("Unit not found"))
         }
@@ -29,10 +29,10 @@ impl Unit {
 
     async fn title(&self, ctx: &Context<'_>) -> Result<String, FieldError> {
         let loader = ctx.data_unchecked::<DataLoader<UnitLoader>>();
-        let p = loader.load_one(self.id).await?;
+        let u = loader.load_one(self.id).await?;
 
-        if let Some(p) = p {
-            Ok(p.title)
+        if let Some(u) = u {
+            Ok(u.title)
         } else {
             Err(FieldError::new("Unit not found"))
         }
@@ -40,10 +40,10 @@ impl Unit {
 
     async fn short(&self, ctx: &Context<'_>) -> Result<String, FieldError> {
         let loader = ctx.data_unchecked::<DataLoader<UnitLoader>>();
-        let p = loader.load_one(self.id).await?;
+        let u = loader.load_one(self.id).await?;
 
-        if let Some(p) = p {
-            Ok(p.short)
+        if let Some(u) = u {
+            Ok(u.short)
         } else {
             Err(FieldError::new("Unit not found"))
         }
@@ -51,10 +51,10 @@ impl Unit {
 
     async fn description(&self, ctx: &Context<'_>) -> Result<String, FieldError> {
         let loader = ctx.data_unchecked::<DataLoader<UnitLoader>>();
-        let p = loader.load_one(self.id).await?;
+        let u = loader.load_one(self.id).await?;
 
-        if let Some(p) = p {
-            if let Some(desc) = p.description {
+        if let Some(u) = u {
+            if let Some(desc) = u.description {
                 Ok(desc)
             } else {
                 Err(FieldError::new("Unit not found"))
@@ -67,7 +67,7 @@ impl Unit {
 
 
 #[derive(Clone, Debug, Default, InputObject)]
-pub struct UnitInput {
+pub struct InputUnit {
     pub title: String,
     pub short: String,
     pub description: Option<String>,

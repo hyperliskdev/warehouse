@@ -1,9 +1,12 @@
+use std::process::id;
+
 use async_graphql::{dataloader::DataLoader, *};
 use sqlx::{Pool, Postgres};
 
 use crate::objects::{
     location::{InputLocation, Location, LocationLoader},
-    piece::{InputPiece, Piece, PieceLoader}, location_entry::{LocationEntry, self, InputLocationEntry, LocationEntryLoader},
+    location_entry::{self, InputLocationEntry, LocationEntry, LocationEntryLoader},
+    piece::{InputPiece, Piece, PieceLoader}, unit::{UnitLoader, Unit},
 };
 
 pub type IMSSchema = Schema<IMSQuery, IMSMutation, EmptySubscription>;
@@ -13,6 +16,7 @@ pub struct IMSQuery;
 
 #[Object]
 impl IMSQuery {
+
     pub async fn get_piece(&self, ctx: &Context<'_>, id: i32) -> Result<Piece> {
         let loader = ctx.data_unchecked::<DataLoader<PieceLoader>>();
         let piece = loader.load_one(id).await?;
@@ -21,6 +25,22 @@ impl IMSQuery {
     }
 
     pub async fn get_location(&self, ctx: &Context<'_>, id: i32) -> Result<Location> {
+        let loader = ctx.data_unchecked::<DataLoader<LocationLoader>>();
+        let location = loader.load_one(id).await?;
+
+        Ok(location.unwrap())
+    }
+
+    #[graphql(entity)]
+    pub async fn resolve_piece(&self, ctx: &Context<'_>, id: i32) -> Result<Piece> {
+        let loader = ctx.data_unchecked::<DataLoader<PieceLoader>>();
+        let piece = loader.load_one(id).await?;
+
+        Ok(piece.unwrap())
+    }
+
+    #[graphql(entity)]
+    pub async fn resolve_location(&self, ctx: &Context<'_>, id: i32) -> Result<Location> {
         let loader = ctx.data_unchecked::<DataLoader<LocationLoader>>();
         let location = loader.load_one(id).await?;
 
@@ -42,6 +62,8 @@ impl IMSQuery {
 
         Ok(pieces)
     }
+
+    
     pub async fn get_locations(&self, ctx: &Context<'_>, ids: Vec<i32>) -> Result<Vec<Location>> {
         let loader = ctx.data_unchecked::<DataLoader<LocationLoader>>();
 
@@ -58,25 +80,38 @@ impl IMSQuery {
         Ok(locations)
     }
 
+    // The request will return a list of locations that a piece is in
     pub async fn find_piece(&self, ctx: &Context<'_>, id: i32) -> Result<Vec<Location>> {
         let pool = ctx.data_unchecked::<Pool<Postgres>>();
         let loader = ctx.data_unchecked::<DataLoader<LocationLoader>>();
 
         let locations = sqlx::query_as!(
-            Location, 
+            Location,
             "SELECT * FROM ims.locations WHERE id IN 
-            (SELECT location_id FROM ims.location_entries WHERE piece_id = $1)", 
-            id)
-            .fetch_all(pool)
-            .await?;
+            (SELECT location_id FROM ims.location_entries WHERE piece_id = $1)",
+            id
+        )
+        .fetch_all(pool)
+        .await?;
 
         // Add the locations to the loader
         // Not taking credit for this if it works, fuck this shit or thanks copilot.
-        loader.feed_many(locations.iter().map(
-            |location| (location.id, location.clone())
-        )).await;
+        loader
+            .feed_many(
+                locations
+                    .iter()
+                    .map(|location| (location.id, location.clone())),
+            )
+            .await;
 
         Ok(locations)
+    }
+
+    pub async fn get_unit(&self, ctx: &Context<'_>, id: i32) -> Result<Unit> {
+        let loader = ctx.data_unchecked::<DataLoader<UnitLoader>>();
+        let unit = loader.load_one(id).await?;
+
+        Ok(unit.unwrap())
     }
 }
 
@@ -85,7 +120,6 @@ pub struct IMSMutation;
 
 #[Object]
 impl IMSMutation {
-    
     pub async fn create_piece(&self, ctx: &Context<'_>, new_piece: InputPiece) -> Result<Piece> {
         let pool = ctx.data_unchecked::<Pool<Postgres>>();
         let loader = ctx.data_unchecked::<DataLoader<PieceLoader>>();
@@ -152,7 +186,9 @@ impl IMSMutation {
         .await?;
 
         // Add the new location to the loader
-        loader.feed_one(location_entry.id, location_entry.clone()).await;
+        loader
+            .feed_one(location_entry.id, location_entry.clone())
+            .await;
 
         Ok(location_entry)
     }

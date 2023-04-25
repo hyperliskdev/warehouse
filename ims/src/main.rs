@@ -1,5 +1,6 @@
 mod objects;
 mod schema;
+mod inventory;
 
 use actix_web::{guard, web, web::Data, App, HttpResponse, HttpServer, Result, rt::spawn};
 use async_graphql::{http::GraphiQLSource, EmptySubscription, Schema, dataloader::DataLoader};
@@ -10,6 +11,7 @@ use crate::{schema::{IMSMutation, IMSQuery}, objects::{location::LocationLoader,
 async fn index(schema: web::Data<IMSSchema>, req: GraphQLRequest) -> GraphQLResponse {
     schema.execute(req.into_inner()).await.into()
 }
+
 
 async fn index_graphiql() -> Result<HttpResponse> {
     Ok(HttpResponse::Ok()
