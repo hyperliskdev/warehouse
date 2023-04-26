@@ -113,6 +113,7 @@ impl IMSQuery {
 
         Ok(unit.unwrap())
     }
+
 }
 
 #[derive(Default)]
@@ -193,6 +194,32 @@ impl IMSMutation {
         Ok(location_entry)
     }
 
+    pub async fn create_unit(
+        &self, 
+        ctx: &Context<'_>,
+        new_unit: InputUnit,
+    ) -> Result<Unit> { 
+        let pool = ctx.data_unchecked::<Pool<Postgres>>();
+        let loader = ctx.data_unchecked::<DataLoader<UnitLoader>>();
+
+        // Create the new unit
+        let unit = sqlx::query_as!(
+            Unit,
+            "INSERT INTO ims.units (name, short, description) VALUES ($1, $2, $3) RETURNING *",
+            new_unit.name,
+            new_unit.short,
+            new_unit.description
+        )
+        .fetch_one(pool)
+        .await?;
+
+        // Add the new unit to the loader
+        loader.feed_one(unit.id, unit.clone()).await;
+
+        Ok(unit)
+    }
+
+    
     pub async fn update_piece(&self, id: i32, input: InputPiece) -> Result<Piece> {
         todo! {}
     }
