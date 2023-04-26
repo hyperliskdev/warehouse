@@ -1,53 +1,143 @@
 // Piece's go inside Locations
 
-use async_graphql::{Object, Context};
-use sqlx::{Postgres, Pool};
+use std::collections::HashMap;
+
+use async_graphql::{Object, Context, InputObject, futures_util::TryStreamExt, async_trait, FieldError, dataloader::DataLoader};
 use uuid::Uuid;
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, sqlx::FromRow)]
 pub struct Piece {
-    id: i32,
-    piece_code: Uuid,
-    name: String,
-    category: i32,
+    pub id: i32,
+    pub code: Uuid,
+    pub name: String,
+    pub description: Option<String>,
+    pub category: Option<i32>,
+    pub created_at: chrono::NaiveDateTime,
+    pub updated_at: chrono::NaiveDateTime,
 }
 
 
 #[Object]
 impl Piece {
-    async fn id(&self, ctx: &Context<'_>) -> Result<i32, sqlx::Error> {
-        let pool = ctx.data_unchecked::<Pool<Postgres>>();
-        let (id,): (i32,) = sqlx::query_as("SELECT id FROM pieces WHERE id = $1")
-            .bind(self.id)
-            .fetch_one(pool)
-            .await?;
-        Ok(id)
+    async fn id(&self, ctx: &Context<'_>) -> Result<i32, FieldError> {
+        let loader = ctx.data_unchecked::<DataLoader<PieceLoader>>();
+        let p = loader.load_one(self.id).await?;
+
+
+        if let Some(p) = p {
+            Ok(p.id)
+        } else {
+            Err(FieldError::new("Piece not found"))
+        }
     }
 
-    async fn code(&self, ctx: &Context<'_>) -> Result<Uuid, sqlx::Error> {
-        let pool = ctx.data_unchecked::<Pool<Postgres>>();
-        let (piece_code,): (Uuid,) = sqlx::query_as("SELECT piece_code FROM pieces WHERE id = $1")
-            .bind(self.id)
-            .fetch_one(pool)
-            .await?;
-        Ok(piece_code)
+    async fn code(&self, ctx: &Context<'_>) -> Result<Uuid, FieldError> {
+        let loader = ctx.data_unchecked::<DataLoader<PieceLoader>>();
+
+        let p = loader.load_one(self.id).await?;
+
+        if let Some(p) = p {
+            Ok(p.code)
+        } else {
+            Err(FieldError::new("Piece not found"))
+        }
     }
 
-    async fn name(&self, ctx: &Context<'_>) -> Result<String, sqlx::Error> {
-        let pool = ctx.data_unchecked::<Pool<Postgres>>();
-        let (name,): (String,) = sqlx::query_as("SELECT name FROM pieces WHERE id = $1")
-            .bind(self.id)
-            .fetch_one(pool)
-            .await?;
-        Ok(name)
+    async fn name(&self, ctx: &Context<'_>) -> Result<String, FieldError> {
+        let loader = ctx.data_unchecked::<DataLoader<PieceLoader>>();
+        let p = loader.load_one(self.id).await?;
+
+        if let Some(p) = p {
+            Ok(p.name)
+        } else {
+            Err(FieldError::new("Piece not found"))
+        }
     }
 
-    async fn category(&self, ctx: &Context<'_>) -> Result<i32, sqlx::Error> {
-        let pool = ctx.data_unchecked::<Pool<Postgres>>();
-        let (category,): (i32,) = sqlx::query_as("SELECT category FROM pieces WHERE id = $1")
-            .bind(self.id)
-            .fetch_one(pool)
-            .await?;
-        Ok(category)
+    async fn description(&self, ctx: &Context<'_>) -> Result<String, FieldError> {
+        let loader = ctx.data_unchecked::<DataLoader<PieceLoader>>();
+        let p = loader.load_one(self.id).await?;
+
+        if let Some(p) = p {
+            if let Some(desc) = p.description {
+                Ok(desc)
+            } else {
+                Ok("This piece has no description".to_string())
+            }
+        } else {
+            Err(FieldError::new("Piece not found"))
+        }
+    }
+
+    async fn category(&self, ctx: &Context<'_>) -> Result<i32, FieldError> {
+        let loader = ctx.data_unchecked::<DataLoader<PieceLoader>>();
+        let p = loader.load_one(self.id).await?;
+
+        if let Some(p) = p {
+            if let Some(category) = p.category {
+                Ok(category)
+            } else {
+                Err(FieldError::new("This piece has no category"))
+            }
+        } else {
+            Err(FieldError::new("Piece not found"))
+        }
+    }
+
+    async fn created_at(&self, ctx: &Context<'_>) -> Result<chrono::NaiveDateTime, FieldError> {
+        let loader = ctx.data_unchecked::<DataLoader<PieceLoader>>();
+        let p = loader.load_one(self.id).await?;
+
+        if let Some(p) = p {
+            Ok(p.created_at)
+        } else {
+            Err(FieldError::new("Piece not found"))
+        }
+    }
+
+    async fn updated_at(&self, ctx: &Context<'_>) -> Result<chrono::NaiveDateTime, FieldError> {
+        let loader = ctx.data_unchecked::<DataLoader<PieceLoader>>();
+        let p = loader.load_one(self.id).await?;
+
+        if let Some(p) = p {
+            Ok(p.updated_at)
+        } else {
+            Err(FieldError::new("Piece not found"))
+        }
+    }
+}
+
+
+#[derive(Clone, Debug, Default, InputObject)]
+pub struct InputPiece {
+    pub name: String,
+    pub description: Option<String>,
+    pub category: Option<i32>,
+}
+
+pub struct PieceLoader {
+    pool: sqlx::PgPool,
+}
+
+impl PieceLoader {
+    pub fn new(pool: sqlx::PgPool) -> Self {
+        Self { pool }
+    }
+}
+
+#[async_trait::async_trait]
+impl async_graphql::dataloader::Loader<i32> for PieceLoader {
+    type Value = Piece;
+    type Error = FieldError;
+
+    async fn load(&self, keys: &[i32]) -> Result<HashMap<i32, Self::Value>, Self::Error> {
+        Ok(
+            sqlx::query_as("SELECT * FROM ims.pieces WHERE id = ANY($1)")
+                .bind(keys)
+                .fetch(&self.pool)
+                .map_ok(|p: Piece| (p.id, p))
+                .try_collect()
+                .await?
+        )
     }
 }

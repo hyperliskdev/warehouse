@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 actix-web = "*"
 
+async-std = { version = "*", features = [ "attributes" ] }
 sqlx-cli = { version = "*" }
 sqlx = { version = "*", features = [ "postgres", "macros", "chrono", "json", "uuid", "runtime-actix-native-tls" ]}
 async-graphql = { version = "*", features = [ "chrono", "log", "tracing", "uuid", "dataloader" ] }
