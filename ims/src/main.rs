@@ -1,6 +1,5 @@
 mod objects;
 mod schema;
-mod inventory;
 
 use actix_web::{guard, web, web::Data, App, HttpResponse, HttpServer, Result, rt::spawn};
 use async_graphql::{http::GraphiQLSource, EmptySubscription, Schema, dataloader::DataLoader};

@@ -1,4 +1,3 @@
-use std::process::id;
 
 use async_graphql::{dataloader::DataLoader, *};
 use sqlx::{Pool, Postgres};
@@ -6,7 +5,7 @@ use sqlx::{Pool, Postgres};
 use crate::objects::{
     location::{InputLocation, Location, LocationLoader},
     location_entry::{self, InputLocationEntry, LocationEntry, LocationEntryLoader},
-    piece::{InputPiece, Piece, PieceLoader}, unit::{UnitLoader, Unit},
+    piece::{InputPiece, Piece, PieceLoader}, unit::{UnitLoader, Unit, InputUnit},
 };
 
 pub type IMSSchema = Schema<IMSQuery, IMSMutation, EmptySubscription>;
@@ -205,8 +204,8 @@ impl IMSMutation {
         // Create the new unit
         let unit = sqlx::query_as!(
             Unit,
-            "INSERT INTO ims.units (name, short, description) VALUES ($1, $2, $3) RETURNING *",
-            new_unit.name,
+            "INSERT INTO ims.units (title, short, description) VALUES ($1, $2, $3) RETURNING *",
+            new_unit.title,
             new_unit.short,
             new_unit.description
         )
