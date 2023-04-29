@@ -23,6 +23,7 @@ impl Piece {
         let loader = ctx.data_unchecked::<DataLoader<PieceLoader>>();
         let p = loader.load_one(self.id).await?;
 
+        
 
         if let Some(p) = p {
             Ok(p.id)
