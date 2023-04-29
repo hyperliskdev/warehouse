@@ -115,3 +115,11 @@ impl Employee {
         Ok(updated_at)
     }
 }
+
+
+#[derive(Clone, Debug, Default, InputObject)]
+pub struct InputEmployee {
+    pub first_name: String,
+    pub last_name: String,
+    pub password: String,
+}

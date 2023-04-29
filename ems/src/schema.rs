@@ -2,9 +2,6 @@ use async_graphql::{Context, EmptySubscription, Schema, Object, Result};
 
 use crate::objects::employee::Employee;
 
-
-
-
 pub type EMSSchema = Schema<EMSQuery, EMSMutation, EmptySubscription>;
 
 
