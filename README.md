@@ -9,15 +9,19 @@ warehouse aims to integrate each step of the distribution process to get the bes
 
 ## Development Plan
 
-Step 1. Inventory mangement
+Step 1. Inventory Mangement System
 
   The first step in this project is to get a basic inventory management system working with GraphQL. Called the IMS, it will take request for managing locations, chaning information about products/resources/tools and organizing said locations. The IMS will be a federated graphql service and interact with the other parts of the warehouse ecosystem through graphql. 
 
 
-Step 2. Order system
+Step 2. Order Management System
 
-Step 3. Authentication
+Step 3. Employee Management System
 
-Step 4. Data streaming and logging
+Step 4. Gateway Integration
+
+Step 5. Authentication
+
+Step 6. Data streaming and logging
 
   This section is about compiling all the order and selling data into infomation companies can use to have the best supply chain information.
