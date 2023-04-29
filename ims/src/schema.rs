@@ -16,20 +16,6 @@ pub struct IMSQuery;
 #[Object]
 impl IMSQuery {
 
-    pub async fn get_piece(&self, ctx: &Context<'_>, id: i32) -> Result<Piece> {
-        let loader = ctx.data_unchecked::<DataLoader<PieceLoader>>();
-        let piece = loader.load_one(id).await?;
-
-        Ok(piece.unwrap())
-    }
-
-    pub async fn get_location(&self, ctx: &Context<'_>, id: i32) -> Result<Location> {
-        let loader = ctx.data_unchecked::<DataLoader<LocationLoader>>();
-        let location = loader.load_one(id).await?;
-
-        Ok(location.unwrap())
-    }
-
     #[graphql(entity)]
     pub async fn resolve_piece(&self, ctx: &Context<'_>, id: i32) -> Result<Piece> {
         let loader = ctx.data_unchecked::<DataLoader<PieceLoader>>();
@@ -46,7 +32,22 @@ impl IMSQuery {
         Ok(location.unwrap())
     }
 
-    pub async fn get_pieces(&self, ctx: &Context<'_>, ids: Vec<i32>) -> Result<Vec<Piece>> {
+
+    pub async fn piece(&self, ctx: &Context<'_>, id: i32) -> Result<Piece> {
+        let loader = ctx.data_unchecked::<DataLoader<PieceLoader>>();
+        let piece = loader.load_one(id).await?;
+
+        Ok(piece.unwrap())
+    }
+
+    pub async fn location(&self, ctx: &Context<'_>, id: i32) -> Result<Location> {
+        let loader = ctx.data_unchecked::<DataLoader<LocationLoader>>();
+        let location = loader.load_one(id).await?;
+
+        Ok(location.unwrap())
+    }
+
+    pub async fn pieces(&self, ctx: &Context<'_>, ids: Vec<i32>) -> Result<Vec<Piece>> {
         let loader = ctx.data_unchecked::<DataLoader<PieceLoader>>();
 
         let load_pieces = loader.load_many(ids).await?;
@@ -63,7 +64,7 @@ impl IMSQuery {
     }
 
     
-    pub async fn get_locations(&self, ctx: &Context<'_>, ids: Vec<i32>) -> Result<Vec<Location>> {
+    pub async fn locations(&self, ctx: &Context<'_>, ids: Vec<i32>) -> Result<Vec<Location>> {
         let loader = ctx.data_unchecked::<DataLoader<LocationLoader>>();
 
         let load_locations = loader.load_many(ids).await?;
@@ -106,7 +107,7 @@ impl IMSQuery {
         Ok(locations)
     }
 
-    pub async fn get_unit(&self, ctx: &Context<'_>, id: i32) -> Result<Unit> {
+    pub async fn unit(&self, ctx: &Context<'_>, id: i32) -> Result<Unit> {
         let loader = ctx.data_unchecked::<DataLoader<UnitLoader>>();
         let unit = loader.load_one(id).await?;
 
