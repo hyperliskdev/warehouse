@@ -31,8 +31,7 @@ async fn main() -> std::io::Result<()> {
 
     let schema = Schema::build(EMSQuery, EMSMutation, EmptySubscription)
         .enable_federation()
-        .data( pg_pool.clone()
-        )
+        .data(pg_pool.clone())
         .finish();
 
     println!("GraphiQL IDE: http://localhost:8000");

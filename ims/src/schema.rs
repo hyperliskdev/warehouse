@@ -4,7 +4,7 @@ use sqlx::{Pool, Postgres};
 
 use crate::objects::{
     location::{InputLocation, Location, LocationLoader},
-    location_entry::{self, InputLocationEntry, LocationEntry, LocationEntryLoader},
+    location_entry::{InputLocationEntry, LocationEntry, LocationEntryLoader},
     piece::{InputPiece, Piece, PieceLoader}, unit::{UnitLoader, Unit, InputUnit},
 };
 

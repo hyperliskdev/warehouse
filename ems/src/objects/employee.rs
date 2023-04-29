@@ -1,6 +1,6 @@
 // Employee
 
-use async_graphql::{Context, FieldError};
+use async_graphql::{Context, FieldError, InputObject, Object};
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 
@@ -21,25 +21,26 @@ impl Employee {
     async fn id(&self, ctx: &Context<'_>) -> Result<i32, FieldError> {
         let pool = ctx.data_unchecked::<Pool<Postgres>>();
 
-        let employee_id = sqlx::query!(
+        let (employee_id,): (i32,) = sqlx::query_as(
             r#"
                 SELECT id FROM ems.employees WHERE id = $1
             "#,
-            self.id
-        ).fetch_one(pool)
+            
+        ).bind(self.id).fetch_one(pool)
         .await?;
+
         Ok(employee_id)
     }
 
     async fn employee_code(&self, ctx: &Context<'_>) -> Result<Uuid, FieldError> {
         let pool = ctx.data_unchecked::<Pool<Postgres>>();
 
-        let employee_code = sqlx::query!(
+        let (employee_code,): (Uuid,) = sqlx::query_as(
             r#"
                 SELECT employee_code FROM ems.employees WHERE id = $1
             "#,
-            self.id
-        ).fetch_one(pool)
+            
+        ).bind(self.id).fetch_one(pool)
         .await?;
 
         Ok(employee_code)
@@ -48,12 +49,12 @@ impl Employee {
     async fn first_name(&self, ctx: &Context<'_>) -> Result<String, FieldError> {
         let pool = ctx.data_unchecked::<Pool<Postgres>>();
 
-        let first_name = sqlx::query!(
+        let (first_name,): (String,) = sqlx::query_as(
             r#"
                 SELECT first_name FROM ems.employees WHERE id = $1
             "#,
-            self.id
-        ).fetch_one(pool)
+            
+        ).bind(self.id).fetch_one(pool)
         .await?;
 
         Ok(first_name)
@@ -62,12 +63,12 @@ impl Employee {
     async fn last_name(&self, ctx: &Context<'_>) -> Result<String, FieldError> {
         let pool = ctx.data_unchecked::<Pool<Postgres>>();
 
-        let last_name = sqlx::query!(
+        let (last_name,): (String,) = sqlx::query_as(
             r#"
                 SELECT last_name FROM ems.employees WHERE id = $1
             "#,
-            self.id
-        ).fetch_one(pool)
+            
+        ).bind(self.id).fetch_one(pool)
         .await?;
 
         Ok(last_name)
@@ -76,12 +77,12 @@ impl Employee {
     async fn password(&self, ctx: &Context<'_>) -> Result<String, FieldError> {
         let pool = ctx.data_unchecked::<Pool<Postgres>>();
 
-        let password = sqlx::query!(
+        let (password,): (String,) = sqlx::query_as(
             r#"
                 SELECT password FROM ems.employees WHERE id = $1
             "#,
-            self.id
-        ).fetch_one(pool)
+            
+        ).bind(self.id).fetch_one(pool)
         .await?;
 
         Ok(password)
@@ -90,12 +91,12 @@ impl Employee {
     async fn created_at(&self, ctx: &Context<'_>) -> Result<chrono::NaiveDateTime, FieldError> {
         let pool = ctx.data_unchecked::<Pool<Postgres>>();
 
-        let created_at = sqlx::query!(
+        let (created_at,): (chrono::NaiveDateTime,) = sqlx::query_as(
             r#"
                 SELECT created_at FROM ems.employees WHERE id = $1
             "#,
-            self.id
-        ).fetch_one(pool)
+            
+        ).bind(self.id).fetch_one(pool)
         .await?;
 
         Ok(created_at)
@@ -104,12 +105,12 @@ impl Employee {
     async fn updated_at(&self, ctx: &Context<'_>) -> Result<chrono::NaiveDateTime, FieldError> {
         let pool = ctx.data_unchecked::<Pool<Postgres>>();
 
-        let updated_at = sqlx::query!(
+        let (updated_at,): (chrono::NaiveDateTime,) = sqlx::query_as(
             r#"
                 SELECT updated_at FROM ems.employees WHERE id = $1
             "#,
-            self.id
-        ).fetch_one(pool)
+            
+        ).bind(self.id).fetch_one(pool)
         .await?;
 
         Ok(updated_at)
