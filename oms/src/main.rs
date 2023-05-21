@@ -8,7 +8,7 @@ use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
 use schema::OMSSchema;
 use crate::{schema::{OMSMutation, OMSQuery}, objects::{order::OrderLoader, order_line::OrderLineLoader}};
 
-async fn index(schema: web::Data<IMSSchema>, req: GraphQLRequest) -> GraphQLResponse {
+async fn index(schema: web::Data<OMSSchema>, req: GraphQLRequest) -> GraphQLResponse {
     schema.execute(req.into_inner()).await.into()
 }
 
