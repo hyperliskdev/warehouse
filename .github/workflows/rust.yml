@@ -22,10 +22,12 @@ jobs:
       - name: Checkout warehouse code repo
         uses: actions/checkout@v3
         
-      - name: SQLx Create DB
+      - name: Install sqlX-cli
+        run: cargo install sqlx-cli
+        
+      - name: Run sqlx commands
         run: cargo sqlx database create
         
-      - name: Run SQL Migration
-        run: cargo sqlx migrate run
+      
         
       
