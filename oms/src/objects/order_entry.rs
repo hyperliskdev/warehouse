@@ -1,9 +1,5 @@
 use std::collections::HashMap;
-
 use async_graphql::{InputObject, async_trait, dataloader::{Loader, DataLoader}, FieldError, Context, Object, futures_util::TryStreamExt};
-
-
-
 
 #[derive(Clone, Debug, Default, sqlx::FromRow)]
 pub struct OrderEntry {
@@ -12,7 +8,7 @@ pub struct OrderEntry {
     pub piece_id: i32,
     pub quantity: i32,
     pub unit: i32,
-    pub line_price: i32,
+    pub line_price: f64,
     pub created_at: chrono::NaiveDateTime,
     pub updated_at: chrono::NaiveDateTime,
 }
@@ -75,7 +71,7 @@ impl OrderEntry {
         }
     }
 
-    async fn line_price(&self, ctx: &Context<'_>) -> Result<i32, FieldError> {
+    async fn line_price(&self, ctx: &Context<'_>) -> Result<f64, FieldError> {
         let loader = ctx.data_unchecked::<DataLoader<OrderEntryLoader>>();
         let order_entry = loader.load_one(self.id).await?;
 
@@ -115,7 +111,6 @@ pub struct InputOrderEntry {
     pub order_id: i32,
     pub piece_id: i32,
     pub quantity: i32,
-    pub unit: i32,
 }
 
 pub struct OrderEntryLoader {

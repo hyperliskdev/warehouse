@@ -1,13 +1,14 @@
 use std::collections::HashMap;
 
 use async_graphql::{Object, Context, FieldError, dataloader::{DataLoader, Loader}, InputObject, async_trait, futures_util::TryStreamExt};
+use uuid::Uuid;
 
 
 
 #[derive(Clone, Debug, Default, sqlx::FromRow)]
 pub struct Order {
     pub id: i32,
-    pub code: i32,
+    pub code: Uuid,
     pub title: String,
     pub description: Option<String>,
     pub created_at: chrono::NaiveDateTime,
@@ -28,7 +29,7 @@ impl Order {
         }
     }
 
-    async fn code(&self, ctx: &Context<'_>) -> Result<i32, FieldError> {
+    async fn code(&self, ctx: &Context<'_>) -> Result<Uuid, FieldError> {
         let loader = ctx.data_unchecked::<DataLoader<OrderLoader>>();
         let order = loader.load_one(self.id).await?;
 
@@ -89,7 +90,6 @@ impl Order {
 
 #[derive(Clone, Debug, Default, InputObject)]
 pub struct InputOrder {
-    pub code: i32,
     pub title: String,
     pub description: Option<String>,
 }
