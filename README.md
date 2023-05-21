@@ -1,27 +1,26 @@
 # warehouse
-a federated business tool to connect the worlds moving resources.
+a federated business tool to connect, map and optimize the movement of resources on the planet.
 
-warehouse aims to integrate each step of the distribution process to get the best data for what the world needs.
+warehouse aims to take the basic systems of buisness and turn them into their own data environment to be collected, explored and predicted.
 
-- industry agnostic --> data is separated by the things that you choose.
-- federated --> each company hosts their own data 
-- unenforced --> its up to the company whether they want to participate.
 
 ## Development Plan
 
 Step 1. Inventory Mangement System
-
-  The first step in this project is to get a basic inventory management system working with GraphQL. Called the IMS, it will take request for managing locations, chaning information about products/resources/tools and organizing said locations. The IMS will be a federated graphql service and interact with the other parts of the warehouse ecosystem through graphql. 
-
+  Manage the storage and movement of goods within a buisness.
 
 Step 2. Order Management System
+  The main idea behind a buisness (in warehouse) is to provide a product through some type of "order".
 
 Step 3. Employee Management System
+  Manage the responsibilitys, training, payroll ... of employees within a buisness
 
 Step 4. Gateway Integration
 
+  Connect together instances of warehouse and create some basic webUI or something related like maybe a python script for RPi.
+
 Step 5. Authentication
 
-Step 6. Data streaming and logging
+  Using maybe data from Employees or 
 
-  This section is about compiling all the order and selling data into infomation companies can use to have the best supply chain information.
+Step 6. Data streaming and logging
