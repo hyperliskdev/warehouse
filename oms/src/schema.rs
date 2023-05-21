@@ -1,4 +1,6 @@
-use async_graphql::{dataloader::DataLoader, Context, Schema, EmptySubscription};
+use async_graphql::{dataloader::DataLoader, Context, Schema, EmptySubscription, Object, Result};
+
+use crate::objects::{order::{OrderLoader, Order, InputOrder}, order_entry::{OrderEntry, OrderEntryLoader, InputOrderEntry}};
 
 pub type OMSSchema = Schema<OMSQuery, OMSMutation, EmptySubscription>;
 
@@ -25,16 +27,16 @@ impl OMSQuery {
         Ok(order.unwrap())
     }
 
-    pub async fn line_item(&self, ctx: &Context<'_>, id: i32) -> Result<LineItem> {
-        let loader = ctx.data_unchecked::<DataLoader<LineItemLoader>>();
+    pub async fn line_item(&self, ctx: &Context<'_>, id: i32) -> Result<OrderEntry> {
+        let loader = ctx.data_unchecked::<DataLoader<OrderEntryLoader>>();
         let line_item = loader.load_one(id).await?;
 
         Ok(line_item.unwrap())
     }
 
     #[graphql(entity)]
-    pub async fn resolve_line_item(&self, ctx: &Context<'_>, id: i32) -> Result<LineItem> {
-        let loader = ctx.data_unchecked::<DataLoader<LineItemLoader>>();
+    pub async fn resolve_order_entry(&self, ctx: &Context<'_>, id: i32) -> Result<OrderEntry> {
+        let loader = ctx.data_unchecked::<DataLoader<OrderEntryLoader>>();
         let line_item = loader.load_one(id).await?;
 
         Ok(line_item.unwrap())
@@ -47,17 +49,17 @@ pub struct OMSMutation;
 #[Object]
 impl OMSMutation {
 
-    pub async fn create_order(&self, ctx: &Context<'_>, input: NewOrder) -> Result<Order> {
+    pub async fn create_order(&self, ctx: &Context<'_>, input: InputOrder) -> Result<Order> {
         let loader = ctx.data_unchecked::<DataLoader<OrderLoader>>();
-        let order = loader.create_one(input).await?;
-
+        // let order = loader.create_one(input).await?;
+        todo!();
         Ok(order.unwrap())
     }
 
-    pub async fn create_line_item(&self, ctx: &Context<'_>, input: NewLineItem) -> Result<LineItem> {
-        let loader = ctx.data_unchecked::<DataLoader<LineItemLoader>>();
-        let line_item = loader.create_one(input).await?;
-
+    pub async fn create_line_item(&self, ctx: &Context<'_>, input: InputOrderEntry) -> Result<OrderEntry> {
+        let loader = ctx.data_unchecked::<DataLoader<OrderEntryLoader>>();
+        // let line_item = loader.create_one(input).await?;
+        todo!();
         Ok(line_item.unwrap())
     }
 }

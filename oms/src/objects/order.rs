@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use async_graphql::{Object, Context, FieldError, dataloader::{DataLoader, Loader}, InputObject, async_trait};
+use async_graphql::{Object, Context, FieldError, dataloader::{DataLoader, Loader}, InputObject, async_trait, futures_util::TryStreamExt};
 
 
 
@@ -88,7 +88,7 @@ impl Order {
 
 
 #[derive(Clone, Debug, Default, InputObject)]
-pub struct OrderInput {
+pub struct InputOrder {
     pub code: i32,
     pub title: String,
     pub description: Option<String>,
@@ -110,11 +110,13 @@ impl Loader<i32> for OrderLoader {
     type Error = FieldError;
 
     async fn load(&self, keys: &[i32]) -> Result<HashMap<i32, Self::Value>, Self::Error> {
-        sqlx::query_as("SELECT * FROM oms.orders WHERE id = ANY($1)")
+        Ok(
+            sqlx::query_as("SELECT * FROM oms.orders WHERE id = ANY($1)")
                 .bind(keys)
                 .fetch(&self.pool)
                 .map_ok(|ord: Order| (ord.id, ord))
                 .try_collect()
                 .await?
+        )
     }
 }
