@@ -46,5 +46,5 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: sqlx database create
-        env:
-          DATABASE_UR: =postgres://postgres:warehouse@localhost/warehouse
+    env:
+      DATABASE_UR: =postgres://postgres:warehouse@localhost/warehouse
