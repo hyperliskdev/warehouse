@@ -30,11 +30,8 @@ jobs:
           
       - name: Checkout master
         uses: actions/checkout@v1
-      
-      - name: Install sqlx-cli
-        run: cargo install sqlx-cli
-        
-      - name: Run create database
-        run: cargo sqlx database create
+        run: |
+          cargo install sqlx-cli
+          cargo sqlx database create
         env:
           DATABASE_UR: =postgres://postgres:warehouse@localhost/warehouse
