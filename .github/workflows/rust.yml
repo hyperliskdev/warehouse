@@ -1,4 +1,4 @@
-name: PostgreSQL and Rust CI
+name: Basic Application Tests
 
 on: [ push, pull_request ]
 
@@ -7,35 +7,34 @@ env:
 
 jobs:
 
-  psql-job:
+  migration-job:
     runs-on: ubuntu-latest
+    
+    container: 
+      image: node:latest
     services:
       postgres:
-        image: postgres
+        image: postgres:latest
         env:
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: warehouse
+          POSTGRES_PASSWORD: warehouse
           POSTGRES_USER: postgres
-          POSTGRES_HOST: localhost
           POSTGRES_PORT: 5432
-    
+        ports:
+          - 5432:5432
     steps:
-      - name: Checkout warehouse code repo
-        uses: actions/checkout@v3
-      - name: Create a .env file
-        # You may pin to the exact commit or the version.
-        # uses: DeveloperRic/action-create-env@55154f178faf68afd619cd16f233e5d31489a892
-        uses: DeveloperRic/action-create-env@v1.0.4
-        with:
-          full_text:
-            DATABASE_URL=postgres://postgres:postgres@localhost:5432/warehouse
-          # Directory to write the file to (defaults to .). Parent directories will NOT be created.
-
-      - name: Install sqlX-cli
+      - name: Install PSQL Client
+        run: |
+          apt-get update
+          apt-get install --yes postgres-client
+          
+      - name: Checkout master
+        uses: actions/checkout@v1
+      
+      - name: Install sqlx-cli
         run: cargo install sqlx-cli
         
-      - name: Run sqlx commands
+      - name: Run create database
         run: cargo sqlx database create
-        
-      
-        
-      
+        env:
+          DATABASE_UR: =postgres://postgres:warehouse@localhost/warehouse
