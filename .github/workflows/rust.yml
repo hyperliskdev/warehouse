@@ -21,7 +21,15 @@ jobs:
     steps:
       - name: Checkout warehouse code repo
         uses: actions/checkout@v3
-        
+      - name: Create a .env file
+        # You may pin to the exact commit or the version.
+        # uses: DeveloperRic/action-create-env@55154f178faf68afd619cd16f233e5d31489a892
+        uses: DeveloperRic/action-create-env@v1.0.4
+        with:
+          full_text:
+            DATABASE_URL=postgres://postgres:postgres@localhost:5432/warehouse
+          # Directory to write the file to (defaults to .). Parent directories will NOT be created.
+
       - name: Install sqlX-cli
         run: cargo install sqlx-cli
         
