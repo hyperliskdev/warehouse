@@ -26,7 +26,7 @@ jobs:
       - name: Install PSQL Client
         run: |
           apt-get update
-          apt-get install --yes postgres-client
+          apt-get install --yes postgresql-client
           
       - name: Checkout master
         uses: actions/checkout@v1
