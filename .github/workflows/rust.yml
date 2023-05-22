@@ -38,8 +38,6 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: install sqlx-cli
-          
-      - name: Create sqlx database
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
