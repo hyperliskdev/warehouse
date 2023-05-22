@@ -29,6 +29,6 @@ jobs:
           toolchain: stable
       - run: |
           cargo install sqlx-cli
-          cargo sqlx database create
+          cargo sqlx database create --database-url $DATABASE_URL
     env:
-      DATABASE_UR: =postgres://postgres:warehouse@localhost/warehouse
+      DATABASE_URL: postgres://postgres:warehouse@localhost/warehouse
