@@ -29,9 +29,22 @@ jobs:
           apt-get install --yes postgresql-client
           
       - name: Checkout master
-        uses: actions/checkout@v1
-      - run: |
-          cargo install sqlx-cli
-          cargo sqlx database create
+      - uses: actions/checkout@v1
+      
+      - name: Install sqlx-cli
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - uses: actions-rs/cargo@v1
+        with:
+          command: install sqlx-cli
+          
+      - name: Create sqlx database
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - uses: actions-rs/cargo@v1
+        with:
+          command: sqlx database create
         env:
           DATABASE_UR: =postgres://postgres:warehouse@localhost/warehouse
