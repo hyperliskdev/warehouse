@@ -6,7 +6,6 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-
   migration-job:
     runs-on: ubuntu-latest
     
