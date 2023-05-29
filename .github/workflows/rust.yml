@@ -6,7 +6,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  migration-job:
+  psql-setup-job:
     runs-on: ubuntu-latest
     
     container: 
@@ -21,6 +21,9 @@ jobs:
           POSTGRES_PORT: 5432
         ports:
           - 5432:5432
+  
+  cargo-sqlx-job:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
