@@ -1,14 +1,13 @@
 mod objects;
 mod schema;
 
-
 use actix_web::{guard, web, web::Data, App, HttpResponse, HttpServer, Result, rt::spawn};
 use async_graphql::{http::GraphiQLSource, EmptySubscription, Schema, dataloader::DataLoader};
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
 use schema::OMSSchema;
-use crate::{schema::{OMSMutation, OMSQuery}, objects::{order::OrderLoader, order_line::OrderLineLoader}};
+use crate::{schema::{OMSMutation, OMSQuery}, objects::{order::OrderLoader, order_entry::OrderEntryLoader}};
 
-async fn index(schema: web::Data<IMSSchema>, req: GraphQLRequest) -> GraphQLResponse {
+async fn index(schema: web::Data<OMSSchema>, req: GraphQLRequest) -> GraphQLResponse {
     schema.execute(req.into_inner()).await.into()
 }
 
@@ -30,7 +29,17 @@ async fn main() -> std::io::Result<()> {
 
     let schema = Schema::build(OMSQuery, OMSMutation, EmptySubscription)
         .enable_federation()
-        .data( pg_pool.clone())
+        .data(pg_pool.clone())
+        .data(
+            DataLoader::new(
+                OrderLoader::new(pg_pool.clone()), spawn
+            )
+        )
+        .data(
+            DataLoader::new(
+                OrderEntryLoader::new(pg_pool.clone()), spawn
+            )
+        )
         .finish();
 
     println!("GraphiQL IDE: http://localhost:8000");
