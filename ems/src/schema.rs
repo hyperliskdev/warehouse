@@ -45,7 +45,7 @@ impl EMSMutation {
     pub async fn create_employee(&self, ctx: &Context<'_>, new_employee: InputEmployee) -> Result<String> {
         let pool = ctx.data_unchecked::<Pool<Postgres>>();
 
-        // Create the new location entry
+        // Create the new employee 
         let employee = sqlx::query_as!(
             Employee,
             "INSERT INTO ems.employees (first_name, last_name, password) VALUES ($1, $2, $3) RETURNING *",
