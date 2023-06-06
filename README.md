@@ -1,4 +1,8 @@
 # warehouse
+
+![warehouse](docs/warehouse.png)
+
+
 a federated business tool to connect the worlds moving resources.
 
 warehouse aims to integrate each step of the distribution process to get the best data for what the world needs.

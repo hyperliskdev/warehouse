@@ -7,7 +7,8 @@ pub struct OrderEntry {
     pub order_id: i32,
     pub piece_id: i32,
     pub quantity: i32,
-    pub unit: i32,
+    #[graphql(external)]
+    pub unit: ims::Unit,
     pub line_price: f64,
     pub created_at: chrono::NaiveDateTime,
     pub updated_at: chrono::NaiveDateTime,
