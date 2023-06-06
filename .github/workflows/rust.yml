@@ -1,0 +1,36 @@
+name: Basic Application Tests
+
+on: [ push, pull_request ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  psql-setup-job:
+    runs-on: ubuntu-latest
+    
+    container: 
+      image: node:latest
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: warehouse
+          POSTGRES_PASSWORD: warehouse
+          POSTGRES_USER: postgres
+          POSTGRES_PORT: 5432
+        ports:
+          - 5432:5432
+  
+  cargo-sqlx-job:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - run: |
+          cargo install sqlx-cli
+          cargo sqlx database create --database-url $DATABASE_URL
+    env:
+      DATABASE_URL: postgres://postgres:warehouse@localhost/warehouse
