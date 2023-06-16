@@ -53,7 +53,7 @@ async fn main() -> std::io::Result<()> {
         )
         .finish();
 
-    println!("GraphiQL IDE: http://localhost:8000");
+    println!("GraphiQL IDE: http://localhost:8081");
 
     HttpServer::new(move || {
         App::new()
