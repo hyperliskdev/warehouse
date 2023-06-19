@@ -1,0 +1,9 @@
+[workspace]
+
+members = [
+    "models",
+    "lms",
+    "pms",
+    "ems",
+    "oms"
+]
