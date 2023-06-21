@@ -1,6 +1,7 @@
 
 
-# Order Service
+
+# Inventory Service
 enum OrderStatus {
     IN_PROGRESS
     AWAITING_PAYMENT
@@ -18,7 +19,6 @@ type Order {
     updatedAt: String!
 }
 
-# Product Service
 type Product {
     id: ID!
     name: String!
@@ -38,7 +38,6 @@ type Unit {
     updatedAt: String!
 }
 
-# Location Service
 type Location {
     id: ID!
     title: String!
@@ -58,23 +57,34 @@ type LocationEntry {
 }
 
 
-# Employee Service
+# Human Resources Service
 type Employee {
     id: ID!
-    name: String!
+    first_name: String!
+    last_name: String!
     email: String!
     password: String!
-    role: Role!
+    permissions: [Permission!]!
 
     createdAt: String!
     updatedAt: String!
 }
 
-type Role {
+type Customer {
+    id: ID!
+    first_name: String!
+    last_name: String!
+    email: String!
+    phone_number: String!
+
+    createdAt: String!
+    updatedAt: String!
+}
+
+type Permission {
     id: ID!
     title: String!
-    permissions: [Permission!]!
-    prefix: String
+    
     createdAt: String!
     updatedAt: String!
 }

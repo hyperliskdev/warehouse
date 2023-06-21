@@ -1,9 +1,9 @@
 [workspace]
 
+
 members = [
-    "services/models",
-    "services/ems",
-    "services/lms",
-    "services/oms",
+    "models",
+    "services/ims",
+    "services/hrms",
     "services/pms"
 ]
