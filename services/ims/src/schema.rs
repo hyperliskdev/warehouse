@@ -1,9 +1,12 @@
 use async_graphql::*;
+use models::order::Order;
+
+use crate::input::OrderInput;
 
 
 pub type IMSSchema = Schema<IMSQuery, IMSMutation, EmptySubscription>;
 
-struct IMSQuery;
+pub struct IMSQuery;
 
 #[Object]
 impl IMSQuery {
@@ -14,11 +17,49 @@ impl IMSQuery {
         todo!()
 
     }
-    
+
+    // #[graphql(entity)]
+    // async fn resolve_product(&self, ctx: &Context<'_>, id: String) -> Result<Product> {
+
+    //     todo!()
+
+    // }
+
+    // #[graphql(entity)]
+    // async fn resolve_location(&self, ctx: &Context<'_>, id: String) -> Result<Location> {
+
+    //     todo!()
+
+    // }
+
+    // #[graphql(entity)]
+    // async fn resolve_location_entry(&self, ctx: &Context<'_>, id: String) -> Result<LocationEntry> {
+
+    //     todo!()
+
+    // }
+
+    async fn order(&self, ctx: &Context<'_>, id: String) -> Result<Order> {
+
+        todo!()
+
+    }
+
+    // async fn product(&self, ctx: &Context<'_>, id: String) -> Result<Product> {
+
+    //     todo!()
+
+    // }
+
+    // async fn location(&self, ctx: &Context<'_>, id: String) -> Result<Location> {
+
+    //     todo!()
+
+    // }
 }
 
 
-struct IMSMutation;
+pub struct IMSMutation;
 
 #[Object]
 impl IMSMutation {
