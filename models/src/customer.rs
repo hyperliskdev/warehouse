@@ -1,6 +1,6 @@
-use std::sync::Arc;
+use std::{sync::Arc, collections::HashMap};
 
-use async_graphql::{Object, Context, dataloader::{DataLoader, Loader}, async_trait};
+use async_graphql::{Object, Context, dataloader::{DataLoader, Loader}, async_trait, futures_util::TryStreamExt, FieldError};
 use chrono::{DateTime, Utc};
 use sqlx::{FromRow, Pool, Postgres};
 
@@ -21,17 +21,86 @@ pub struct Customer {
 #[Object]
 impl Customer {
 
-    pub async fn id(&self, ctx: &Context<'_>, id: i32) -> Result<i32, sqlx::Error> {
+    pub async fn id(&self, ctx: &Context<'_>, id: i32) -> Result<i32, FieldError> {
         let pool = ctx.data_unchecked::<Pool<Postgres>>();
         let loader = ctx.data_unchecked::<DataLoader<CustomerLoader>>();
-        let (id, ) = sqlx::query_as::<_, (i32, )>("SELECT id FROM customers WHERE id = $1")
-            .bind(id)
-            .fetch_one(pool)
-            .await?;
+        
+        let customer = loader.load_one(id).await?;
 
-        Ok(id)
+        if let Some(customer) = customer {
+            Ok(customer.id)
+        } else {
+
+            let customer: Customer = sqlx::query_as("SELECT * FROM orders WHERE id = $1")
+                .bind(id)
+                .fetch_one(pool)
+                .await?;
+
+            loader.feed_one(id, customer.clone()).await;
+
+            Ok(customer.id)
+        }
     }
 
+    pub async fn name(&self, ctx: &Context<'_>, id: i32) -> Result<String, FieldError> {
+        let loader = ctx.data_unchecked::<DataLoader<CustomerLoader>>();
+        
+        let customer = loader.load_one(id).await?;
+
+        if let Some(customer) = customer {
+            Ok(customer.name)
+        } else {
+            Err("Customer not found".into())
+        }
+    }
+
+    pub async fn email(&self, ctx: &Context<'_>, id: i32) -> Result<String, FieldError> {
+        let loader = ctx.data_unchecked::<DataLoader<CustomerLoader>>();
+        
+        let customer = loader.load_one(id).await?;
+
+        if let Some(customer) = customer {
+            Ok(customer.email)
+        } else {
+            Err("Customer not found".into())
+        }
+    }
+
+    pub async fn phone(&self, ctx: &Context<'_>, id: i32) -> Result<String, FieldError> {
+        let loader = ctx.data_unchecked::<DataLoader<CustomerLoader>>();
+        
+        let customer = loader.load_one(id).await?;
+
+        if let Some(customer) = customer {
+            Ok(customer.phone)
+        } else {
+            Err("Customer not found".into())
+        }
+    }
+
+    pub async fn updated_at(&self, ctx: &Context<'_>, id: i32) -> Result<DateTime<Utc>, FieldError> {
+        let loader = ctx.data_unchecked::<DataLoader<CustomerLoader>>();
+        
+        let customer = loader.load_one(id).await?;
+
+        if let Some(customer) = customer {
+            Ok(customer.updated_at)
+        } else {
+            Err("Customer not found".into())
+        }
+    }
+
+    pub async fn created_at(&self, ctx: &Context<'_>, id: i32) -> Result<DateTime<Utc>, FieldError> {
+        let loader = ctx.data_unchecked::<DataLoader<CustomerLoader>>();
+        
+        let customer = loader.load_one(id).await?;
+
+        if let Some(customer) = customer {
+            Ok(customer.created_at)
+        } else {
+            Err("Customer not found".into())
+        }
+    }
 }
 
 
@@ -44,17 +113,14 @@ impl Loader<i32> for CustomerLoader {
     type Value = Customer;
     type Error = Arc<sqlx::Error>;
 
-    async fn load(&self, keys: &[i32]) -> Result<std::collections::HashMap<i32, Self::Value>, Self::Error> {
-        let customers = sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE id = ANY($1)")
+    async fn load(&self, keys: &[i32]) -> Result<HashMap<i32, Self::Value>, Self::Error> {
+        Ok(sqlx::query_as("SELECT * FROM customers WHERE id = ANY($1)")
             .bind(keys)
-            .fetch_all(&self.pool)
+            .fetch(&self.pool)
+            .map_ok(|cus: Customer| (cus.id, cus))
+            .map_err(Arc::new)
+            .try_collect::<HashMap<i32, Customer>>()
             .await?
-            .into_iter()
-            .map(|customer| (customer.id, customer))
-            .collect();
-
-        Ok(customers)
+        )
     }
-    
-
 }

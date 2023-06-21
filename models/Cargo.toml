@@ -6,8 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-async-graphql = { version = "5.0.10", features = [ "uuid", "dataloader" ]}
-sqlx = { version = "0.6.3", features = [ "runtime-actix-native-tls", "postgres", "macros", "uuid", "chrono", "json" , "time"] }
+async-graphql = { version = "5.0.10", features = [ "uuid", "dataloader", "chrono" ]}
+sqlx = { version = "0.6.3", features = [ "runtime-actix-native-tls", "postgres", "macros", "uuid", "chrono", "json"] }
 serde = "1.0.130"
 chrono = "*"
-time = "*"
+dataloader = "*"
