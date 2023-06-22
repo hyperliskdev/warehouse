@@ -26,9 +26,13 @@ async fn index_graphiql() -> Result<HttpResponse> {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
 
+    let addr = env::var("SERVER_ADDR").unwrap();
+
     let pool = PgPoolOptions::new()
         .max_connections(5)
         .connect(&env::var("DATABASE_URL").unwrap()).await.unwrap();
+
+
 
 
     let schema = Schema::build(IMSQuery, IMSMutation, EmptySubscription)
@@ -43,13 +47,14 @@ async fn main() -> std::io::Result<()> {
 
     println!("GraphiQL IDE: http://localhost:8002");
 
+
     HttpServer::new(move || {
         App::new()
             .app_data(Data::new(schema.clone()))
             .service(web::resource("/").guard(guard::Post()).to(index))
             .service(web::resource("/").guard(guard::Get()).to(index_graphiql))
     })
-    .bind("127.0.0.1:8002")?
+    .bind(addr)?
     .run()
     .await
 }

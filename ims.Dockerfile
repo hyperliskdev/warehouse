@@ -12,4 +12,8 @@ COPY --from=build /ims/target/release/ims .
 
 CMD ["./ims"]
 
-# love you 3000 <3
+# love you 3000 <3 - alicia 
+
+## Environment Variables
+# DATABASE_URL -> Points to the psql database cluster.
+# SERVER_ADDR -> THe IP to host the microservice on (*.*.*.*:port)
