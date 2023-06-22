@@ -1,6 +1,8 @@
 mod schema;
 mod input;
 
+use std::env;
+
 use actix_web::{guard, web, web::Data, App, HttpResponse, HttpServer, Result};
 use async_graphql::{http::GraphiQLSource, EmptyMutation, EmptySubscription, Schema, dataloader::DataLoader};
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
@@ -26,9 +28,7 @@ async fn main() -> std::io::Result<()> {
 
     let pool = PgPoolOptions::new()
         .max_connections(5)
-        .connect("postgres://postgres:password@localhost/test").await.unwrap();
-
-    
+        .connect(&env::var("DATABASE_URL").unwrap()).await.unwrap();
 
 
     let schema = Schema::build(IMSQuery, IMSMutation, EmptySubscription)

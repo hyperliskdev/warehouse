@@ -11,4 +11,10 @@ async-graphql-actix-web = "5.0.10"
 async-std = "1.12.0"
 sqlx = { version = "0.6.3", features = [ "runtime-actix-native-tls", "postgres", "macros", "uuid", "chrono", "json" ] }
 
-models = { path = "../../models", version = "0.1.0" }
+models = { path = "../../models" }
+
+[[bin]]
+name = "ims"
+path = "src/main.rs"
+
+

@@ -1,5 +1,5 @@
-use async_graphql::*;
-use models::order::Order;
+use async_graphql::{*, dataloader::DataLoader};
+use models::order::{Order, OrderLoader};
 
 use crate::input::OrderInput;
 
@@ -12,9 +12,17 @@ pub struct IMSQuery;
 impl IMSQuery {
 
     #[graphql(entity)]
-    async fn resolve_order(&self, ctx: &Context<'_>, id: String) -> Result<Order> {
+    async fn resolve_order(&self, ctx: &Context<'_>, id: i32) -> Result<Order> {
 
-        todo!()
+        let loader = ctx.data_unchecked::<DataLoader<OrderLoader>>();
+
+        let order = loader.load_one(id).await?;
+
+        if let Some(order) = order {
+            Ok(order)
+        } else {
+            Err("Order not found".into())
+        }
 
     }
 
@@ -39,9 +47,17 @@ impl IMSQuery {
 
     // }
 
-    async fn order(&self, ctx: &Context<'_>, id: String) -> Result<Order> {
+    async fn order(&self, ctx: &Context<'_>, id: i32) -> Result<Order> {
 
-        todo!()
+        let loader = ctx.data_unchecked::<DataLoader<OrderLoader>>();
+
+        let order = loader.load_one(id).await?;
+
+        if let Some(order) = order {
+            Ok(order)
+        } else {
+            Err("Order not found".into())
+        }
 
     }
 
