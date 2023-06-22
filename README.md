@@ -12,7 +12,7 @@ the entire design is written inside `supergraph.graphql`. the comments above eac
 
 ## models
 
-the models library contains both the interactions with the database and the async-graphql 
+the models library contains both the interactions with the database and the async-graphql. each of the models has a struct which contains all the info from a row on the database. 
 
 
 ## service descriptions
