@@ -9,7 +9,7 @@ warehouse aims to take the basic systems of buisness and turn them into their ow
 
 the purpose of the tool is basically for organizations and businesses to manage the procurement and sale of specifically "things". it can also manage employee information as there needs to be a way to login into the application. 
 
-the entire design is written inside ``. the comments above each type give the service that it belongs too. 
+the entire design is written inside `supergraph.graphql`. the comments above each type give the service that it belongs too. 
 
 
 ## service descriptions
