@@ -11,8 +11,16 @@ the purpose of the tool is basically for organizations and businesses to manage 
 
 the entire design is written inside `supergraph.graphql`. the comments above each type give the service that it belongs too. 
 
+## models
+
+the models library contains both the interactions with the database and the async-graphql 
+
 
 ## service descriptions
 
 in the services directory there exists a service for each of the main functions of warehouse. each of these packages is just an async-graphql server that has environment vars points to the database and what address it should have. 
 
+
+### IMS 
+
+this service 
