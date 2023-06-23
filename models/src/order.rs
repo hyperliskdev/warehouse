@@ -6,8 +6,6 @@ use serde::{Serialize};
 use sqlx::{Pool, Postgres, FromRow, postgres::{PgRow, PgDatabaseError}, Row};
 use crate::{order_status::OrderStatus};
 
-
-
 #[derive(Debug, FromRow, Clone)]
 pub struct Order {
     pub id: i32,
@@ -39,18 +37,6 @@ impl Order {
             loader.feed_one(id, order.clone()).await;
 
             Ok(order.id)
-        }
-    }
-
-    pub async fn customer_id(&self, ctx: &Context<'_>, id: i32) -> Result<String, FieldError> {
-        let loader = ctx.data_unchecked::<DataLoader<OrderLoader>>();
-        
-        let order = loader.load_one(id).await?;
-
-        if let Some(order) = order {
-            Ok(order.customer_id)
-        } else {
-            Err("Order not found".into())
         }
     }
 

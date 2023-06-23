@@ -1,8 +1,6 @@
 use async_graphql::InputObject;
 
 
-
-
 #[derive(InputObject)]
 pub struct OrderInput {
     customer_id: i32,

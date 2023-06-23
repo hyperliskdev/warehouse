@@ -4,8 +4,6 @@ use async_graphql::{Object, Context, dataloader::{DataLoader, Loader}, async_tra
 use chrono::{DateTime, Utc};
 use sqlx::{FromRow, Pool, Postgres};
 
-
-
 #[derive(Debug, FromRow, Clone)]
 pub struct Customer {
     pub id: i32,
@@ -15,8 +13,6 @@ pub struct Customer {
     pub updated_at: DateTime<Utc>,
     pub created_at: DateTime<Utc>,
 }
-
-
 
 #[Object]
 impl Customer {
