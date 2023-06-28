@@ -1,8 +1,13 @@
-[workspace]
+[package]
+name = "warehouse"
+version = "0.1.0"
+edition = "2021"
 
-members = [
-    "models",
-    "services/ims",
-    "services/hrms",
-    "services/pms"
-]
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+async-graphql = "*"
+async-graphql-warp = "*"
+
+serde = "*"
+chrono = "*"
