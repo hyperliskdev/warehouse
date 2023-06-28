@@ -1,8 +1,10 @@
 use std::{sync::Arc, collections::HashMap};
 
-use async_graphql::{Object, Context, dataloader::{DataLoader, Loader}, async_trait, futures_util::TryStreamExt, FieldError};
+use async_graphql::{Object, Context, dataloader::{DataLoader, Loader}, async_trait, futures_util::TryStreamExt, FieldError, ComplexObject};
 use chrono::{DateTime, Utc};
 use sqlx::{FromRow, Pool, Postgres};
+
+use crate::order::Order;
 
 
 
@@ -103,6 +105,29 @@ impl Customer {
     }
 }
 
+#[ComplexObject]
+impl Order {
+    pub async fn customer(&self, ctx:&Context<'_>, customer_id: i32) -> Result<Customer, FieldError> {
+        let pool = ctx.data_unchecked::<Pool<Postgres>>();
+        let loader = ctx.data_unchecked::<DataLoader<CustomerLoader>>();
+        
+        let customer = loader.load_one(customer_id).await?;
+
+        if let Some(customer) = customer {
+            Ok(customer)
+        } else {
+
+            let customer: Customer = sqlx::query_as("SELECT * FROM orders WHERE id = $1")
+                .bind(customer_id)
+                .fetch_one(pool)
+                .await?;
+
+            loader.feed_one(customer_id, customer.clone()).await;
+
+            Ok(customer)
+        }
+    }
+}
 
 struct CustomerLoader {
     pool: sqlx::PgPool,

@@ -41,18 +41,7 @@ impl Order {
             Ok(order.id)
         }
     }
-
-    pub async fn customer_id(&self, ctx: &Context<'_>, id: i32) -> Result<String, FieldError> {
-        let loader = ctx.data_unchecked::<DataLoader<OrderLoader>>();
-        
-        let order = loader.load_one(id).await?;
-
-        if let Some(order) = order {
-            Ok(order.customer_id)
-        } else {
-            Err("Order not found".into())
-        }
-    }
+    
 
     pub async fn total(&self, ctx: &Context<'_>, id: i32) -> Result<f64, FieldError> {
         let loader = ctx.data_unchecked::<DataLoader<OrderLoader>>();

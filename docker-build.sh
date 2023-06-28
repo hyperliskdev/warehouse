@@ -1,5 +1,15 @@
-#!/bin/sh
+#!/bin/bash
 
+configure_service_def() {
+  echo "Configuring service definition..."
+
+  service=$(dialog --clear --backtitle "Warehouse Docker Builder" \
+      --title "warehouse" \
+      --menu "Enter service name:" \
+      20 20 2 \
+      2>&1>$(tty))
+
+}
 
 build_service_image() {
   echo "Building $1 image..."
@@ -7,15 +17,17 @@ build_service_image() {
 
 
 ## Main Menu
-dialog --menu "Select an image to build..." 30 30 12 \
-  1 "services" \
-  2 "router" 2> "/tmp/choice.txt"
+image_choice=$(dialog --clear --backtitle "Warehouse Docker Builder" \
+			--title "warehouse" \
+			--menu "Choose an option:" \
+			20 20 2 \
+			1 "Services" \
+      2 "Router" \
+			2>&1>$(tty))
 
-service=$(cat /tmp/choice.txt)
 
-
-case $service in 
-  1) build_service_image(${service}) ;;
-  2) echo "Building HRMS image..." ;;
+case $image_choice in 
+  1) configure_service_def ;;
+  2) configure_router_def ;;
   *) echo "Invalid selection" ;;
 esac
