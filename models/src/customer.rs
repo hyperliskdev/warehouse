@@ -4,10 +4,13 @@ use async_graphql::{Object, Context, dataloader::{DataLoader, Loader}, async_tra
 use chrono::{DateTime, Utc};
 use sqlx::{FromRow, Pool, Postgres};
 
+<<<<<<< HEAD
 use crate::order::Order;
 
 
 
+=======
+>>>>>>> 784820bc7545f71f7550e6b67e876b8ea483e37b
 #[derive(Debug, FromRow, Clone)]
 pub struct Customer {
     pub id: i32,
@@ -17,8 +20,6 @@ pub struct Customer {
     pub updated_at: DateTime<Utc>,
     pub created_at: DateTime<Utc>,
 }
-
-
 
 #[Object]
 impl Customer {

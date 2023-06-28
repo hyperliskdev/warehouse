@@ -6,8 +6,6 @@ use serde::{Serialize};
 use sqlx::{Pool, Postgres, FromRow, postgres::{PgRow, PgDatabaseError}, Row};
 use crate::{order_status::OrderStatus};
 
-
-
 #[derive(Debug, FromRow, Clone)]
 pub struct Order {
     pub id: i32,
@@ -41,6 +39,7 @@ impl Order {
             Ok(order.id)
         }
     }
+
     
 
     pub async fn total(&self, ctx: &Context<'_>, id: i32) -> Result<f64, FieldError> {
