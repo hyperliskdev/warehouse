@@ -1,5 +1,5 @@
 # warehouse
-![warehouse](docs/warehouse.png)
+![warehouse](docs/warehouse.png =100x20)
 
 a federated business tool to connect the worlds moving resources.
 warehouse aims to take the basic systems of buisness and turn them into their own data points to be collected, explored and predicted. 
