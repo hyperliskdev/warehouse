@@ -1,5 +1,4 @@
 # warehouse
-![warehouse](docs/warehouse.png)
 <img src="docs/warehouse.png" width="100%" height="50%"/>
 
 a federated business tool to connect the worlds moving resources.
