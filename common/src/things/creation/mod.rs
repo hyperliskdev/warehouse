@@ -1,2 +1,2 @@
 pub mod constituent;
-pub mod result;
+pub mod compound;

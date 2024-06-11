@@ -40,6 +40,5 @@ impl Unit {
     pub fn updated_at(&self) -> chrono::DateTime<chrono::Utc> {
         self.updated_at
     }
-
     
 }

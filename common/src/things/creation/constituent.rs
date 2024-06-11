@@ -1,34 +1,35 @@
-use crate::things::thing::Thing;
-use crate::things::unit::Unit;
+use serde::{Deserialize, Serialize};
 
+use crate::things::{thing::Thing, unit::Unit};
 
-struct Product {
+use super::compound::Compound;
+
+/*  */
+#[derive(Serialize, Deserialize)]
+pub(crate) struct Constituent {
     id: uuid::Uuid,
     name: String,
     description: String,
-    amount: f64,
-    price: f64,
-    unit: Unit,
+    constituent_in: Vec<Compound>,
     created_at: chrono::DateTime<chrono::Utc>,
     updated_at: chrono::DateTime<chrono::Utc>,
 }
 
-impl Product {
+
+impl Constituent {
     pub fn new(name: String, description: String) -> Self {
         Self {
             id: uuid::Uuid::new_v4(),
             name,
             description,
+            constituent_in: Vec::new(),
             created_at: chrono::Utc::now(),
             updated_at: chrono::Utc::now(),
-            amount: todo!(),
-            price: todo!(),
-            unit: todo!(),
         }
     }
 }
 
-impl Thing for Product {
+impl Thing for Constituent {
     fn id(&self) -> uuid::Uuid {
         self.id
     }
