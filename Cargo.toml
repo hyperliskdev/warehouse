@@ -1,8 +1,5 @@
 [workspace]
 
 members = [
-    "ims",
-    "oms",
-    "ems",
-    
+    "common",
 ]

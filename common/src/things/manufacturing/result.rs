@@ -1,0 +1,1 @@
+// A result is a thing that is created from constituents. (one or more)
