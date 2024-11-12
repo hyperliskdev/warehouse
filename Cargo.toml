@@ -14,3 +14,4 @@ dotenv = "0.15.0"
 uuid = { version = "0.8", features = ["v4"] }
 aws-config = { version= "1.5.10", features = ["behavior-version-latest"] }
 aws-sdk-dynamodb = "1.53.0"
+aws-sdk-s3 = "1.53.0"
