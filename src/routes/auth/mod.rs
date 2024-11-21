@@ -1,8 +1,22 @@
+use thiserror::Error;
+use warp::Filter;
+
 pub mod login;
 pub mod register;
 pub mod logout;
 pub mod refresh;
 
+
+// AuthError
+#[derive(Debug, Error)]
+pub enum AuthError {
+    #[error("Invalid hash")]
+    InvalidHash,
+    #[error("Invalid password")]
+    InvalidPassword,
+    #[error("Hash error: {0}")]
+    HashError(String),
+}
 
 pub fn auth(
     db_client: rusoto_dynamodb::DynamoDbClient,

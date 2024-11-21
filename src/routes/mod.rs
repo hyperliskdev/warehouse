@@ -9,7 +9,11 @@ use rusoto_dynamodb::DynamoDbClient;
 use rusoto_s3::S3Client;
 use warp::Filter;
 
-
+pub fn with_db(
+    db_client: DynamoDbClient,
+) -> impl Filter<Extract = (DynamoDbClient,), Error = std::convert::Infallible> + Clone {
+    warp::any().map(move || db_client.clone())
+}
 
 pub fn api(
     db_client: DynamoDbClient,
