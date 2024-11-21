@@ -9,9 +9,9 @@ edition = "2021"
 warp = "0.3.0"
 tokio = { version = "1", features = ["full"] }
 serde = { version = "1.0", features = ["derive"] }
-sqlx = { version = "0.8", features = [ "postgres", "runtime-tokio", "tls-native-tls" ] }
 dotenv = "0.15.0"
 uuid = { version = "0.8", features = ["v4"] }
 rusoto_core = "0.48.0"
 rusoto_s3 = "0.48.0"
 rusoto_dynamodb = "0.48.0"
+jsonwebtoken = "7.0.1"

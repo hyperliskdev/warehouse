@@ -1,4 +1,5 @@
 pub mod routes;
+pub mod utils;
 
 use rusoto_core::Region;
 use rusoto_dynamodb::DynamoDbClient;
