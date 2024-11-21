@@ -1,5 +1,7 @@
+use std::collections::HashMap;
+
 use rusoto_core::RusotoError;
-use rusoto_dynamodb::{DynamoDb, DynamoDbClient, PutItemError, PutItemInput};
+use rusoto_dynamodb::{AttributeValue, DynamoDb, DynamoDbClient, GetItemInput, PutItemError, PutItemInput};
 
 use crate::models::user::{User, UserError};
 
@@ -32,5 +34,43 @@ pub async fn create_user(
                 _ => Err(Box::new(e)),
             }
         }
+    }
+}
+
+pub async fn get_user(
+    db_client: DynamoDbClient,
+    email: String,
+) -> Result<User, Box<dyn std::error::Error>> {
+    // Create a get_item input
+    let input = GetItemInput {
+        key: {
+            let mut key = HashMap::new();
+            key.insert(
+                "email".to_string(),
+                AttributeValue {
+                    s: Some(email),
+                    ..Default::default()
+                },
+            );
+            key
+        },
+        table_name: "users".to_string(),
+        ..Default::default()
+    };
+
+    // Get the item from the database
+    match db_client.get_item(input).await {
+        Ok(output) => {
+            // Check if the item exists
+            match output.item {
+                Some(item) => {
+                    // Convert the item to a user
+                    let user = User::from_item(item);
+                    Ok(user)
+                }
+                None => Err(Box::new(UserError::UserNotFound)),
+            }
+        }
+        Err(e) => Err(Box::new(e)),
     }
 }

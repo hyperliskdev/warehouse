@@ -10,19 +10,8 @@
 
 ## Features
 
-This section describes the features of warehouse.
-
-#### Model Registry
-A database to keep track of the difference versions of models, their metadata and deployment status.
-
-#### Storage Backend
-Physical storage for model files
-- possibly AWS, GCP or Azure
-
-#### Deployment Services
-Infrastructure for deploying models as microservices
-
-#### User Interface
-A web-based UI for managing models and viewing analytics.
-
+- **Model Registry**: A database to keep track of the difference versions of models, their metadata and deployment status.
+- **Storage Backend**: Physical storage for model files
+- **Deployment Services**: Infrastructure for deploying models as microservices
+- **User Interface**: A web-based UI for managing models and viewing analytics.
 

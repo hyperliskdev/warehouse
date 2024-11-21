@@ -1,10 +1,11 @@
 // User model in dynamodb
 
 
-use std::collections::HashMap;
+use std::{collections::HashMap, error::Error};
 
 use rusoto_dynamodb::{AttributeValue};
 use serde::{Deserialize, Serialize};
+use thiserror::Error;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default, )]
 pub struct User {
@@ -42,17 +43,10 @@ impl User {
 }
 
 // User Errors
-#[derive(Debug)]
+#[derive(Debug, Error)]
 pub enum UserError {
+    #[error("User already exists")]
     UserAlreadyExists,
+    #[error("User not found")]
+    UserNotFound,
 }
-
-impl std::fmt::Display for UserError {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match *self {
-            UserError::UserAlreadyExists => write!(f, "User already exists"),
-        }
-    }
-}
-
-impl std::error::Error for UserError {}
