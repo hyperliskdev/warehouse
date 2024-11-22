@@ -45,7 +45,7 @@ pub async fn create_user(
 pub async fn get_user(
     db_client: DynamoDbClient,
     email: String,
-) -> Result<User, Box<dyn std::error::Error>> {
+) -> Result<User, UserError> {
     // Create a get_item input
     let input = GetItemInput {
         key: {
@@ -73,9 +73,9 @@ pub async fn get_user(
                     let user = User::from_item(item);
                     Ok(user)
                 }
-                None => Err(Box::new(UserError::UserNotFound)),
+                None => Err(UserError::UserNotFound),
             }
         }
-        Err(e) => Err(Box::new(UserError::DynamoDBError(e.to_string()))),
+        Err(e) => Err(UserError::DynamoDBError(e.to_string())),
     }
 }

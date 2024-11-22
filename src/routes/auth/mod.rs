@@ -36,3 +36,12 @@ pub fn auth(
         .with(warp::log("auth"))
 
 }
+
+
+// ware-house.org/auth/login
+// DATA: {"email": "cartertomlenovich@gmail.com", "password": "password"}
+
+// {"warehouse-token": "aw83uyfauinhf9834jfsodrrgf-aeert9ia== " }
+
+
+// ware-house.org/auth/register

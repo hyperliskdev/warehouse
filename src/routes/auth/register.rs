@@ -34,6 +34,7 @@ async fn register_handler(
     register_req: RegisterRequest,
     db_client: DynamoDbClient,
 ) -> Result<impl warp::Reply, warp::Rejection> {
+    
     // Check if the user already exists
     // If the user exists, return an error
     // If the user does not exist, create the user
@@ -47,32 +48,33 @@ async fn register_handler(
         }
         Err(e) => {
             // If the user is not found, create the user
-            match e.downcast_ref::<UserError>() {
-                Some(UserError::UserNotFound) => {
-                    // Create the user
+            match e {
+                UserError::UserNotFound => {
                     let mut user = crate::models::user::User {
                         id: uuid::Uuid::new_v4().to_string(),
                         email: register_req.email.clone(),
                         username: register_req.username.clone(),
                         password: register_req.password.clone(),
-                        created_at: chrono::Utc::now().to_rfc3339(),
-                        updated_at: chrono::Utc::now().to_rfc3339(),
+                        created_at: chrono::Utc::now().to_string(),
+                        updated_at: chrono::Utc::now().to_string(),
                     };
 
-                    let created_user = create_user(db_client, &mut user).await;
-
-                    match created_user {
+                    match create_user(db_client.clone(), &mut user).await {
                         Ok(_) => {
-                            // Return a success message
                             return Ok(warp::reply::json(&RegisterResponse {
-                                message: "User created".to_string(),
+                                message: "User created successfully".to_string(),
                             }));
                         }
-                        Err(_) => return Err(warp::reject()),
+                        Err(_) => {
+                            return Err(warp::reject());
+                        }
                     }
                 }
-                _ => return Err(warp::reject()),
+                _ => {
+                    return Err(warp::reject());
+                }
             }
+
         }
     }
 }
