@@ -8,9 +8,14 @@ use crate::models::user::{User, UserError};
 // Create a new user
 pub async fn create_user(
     db_client: DynamoDbClient,
-    user: User,
+     user: &mut User,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let mut item = user.to_item();
+
+    // Hash the password before trying anything.
+    user.hash_password()?;
+
+    // Create a put_item input
+    let item = user.to_item();
 
     let input = PutItemInput {
         item: item,
@@ -71,6 +76,6 @@ pub async fn get_user(
                 None => Err(Box::new(UserError::UserNotFound)),
             }
         }
-        Err(e) => Err(Box::new(e)),
+        Err(e) => Err(Box::new(UserError::DynamoDBError(e.to_string()))),
     }
 }

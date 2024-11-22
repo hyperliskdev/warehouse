@@ -1,6 +1,9 @@
 // Login route
 
 
+use std::collections::HashMap;
+
+use rusoto_dynamodb::AttributeValue;
 use rusoto_dynamodb::DynamoDb;
 use rusoto_dynamodb::DynamoDbClient;
 use rusoto_dynamodb::GetItemInput;
@@ -10,7 +13,10 @@ use serde::Serialize;
 use serde::Deserialize;
 use warp::Filter;
 
+use crate::handlers::user_handler::get_user;
+use crate::models::user::User;
 use crate::routes::with_db;
+use crate::utils::jwt::generate_token;
 
 #[derive(Debug, Deserialize)]
 pub struct LoginRequest {
@@ -20,7 +26,7 @@ pub struct LoginRequest {
 
 #[derive(Debug, Serialize)]
 pub struct LoginResponse {
-    token: String
+    warehouse_token: String
 }
 
 pub fn login(
@@ -38,24 +44,27 @@ async fn login_handler(
     db_client: DynamoDbClient,
 ) -> Result<impl warp::Reply, warp::Rejection> {
 
-    let mut key =  HashMap::new();
-    key.insert("email".to_string(), login_req.email.clone().into());
-
-    let input = GetItemInput {
-        table_name: "users".to_string(),
-        key: key,
-        ..Default::default()
+    
+    let user: User = match get_user(db_client, login_req.email).await {
+        Ok(user) => user,
+        Err(_) => return Err(warp::reject())
     };
 
-    
-    match db_client.get_item(input).await {
-        Ok(output) => {
-            
-            
-        },
-        Err(_) => {
-            Ok(warp::reply::json(&"Internal server error"))
+    // Verify password with the hashed password.
+    let password_match = user.verify_password(&login_req.password);
+
+    if !password_match.unwrap() {
+        return Err(warp::reject());
+    } else {
+        println!("Password match");
+        let token = generate_token(&user.id);
+        match token {
+            Ok(token) => {
+                return Ok(warp::reply::json(&LoginResponse {
+                    warehouse_token: token
+                }))
+            },
+            Err(_) => return Err(warp::reject())
         }
     }
-
 }

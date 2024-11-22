@@ -1,11 +1,24 @@
 // User model in dynamodb
 
 
+use core::hash;
 use std::{collections::HashMap, error::Error};
 
 use rusoto_dynamodb::{AttributeValue};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
+
+use crate::utils::hash::{hash_password, verify_password};
+
+#[derive(Debug, Error)]
+pub enum UserError {
+    #[error("User already exists")]
+    UserAlreadyExists,
+    #[error("User not found")]
+    UserNotFound,
+    #[error("DynamoDB Error: {0}")]
+    DynamoDBError(String),
+}
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default, )]
 pub struct User {
@@ -40,13 +53,20 @@ impl User {
             updated_at: item.get("updated_at").unwrap().s.as_ref().unwrap().to_string(),
         }
     }
+
+    pub fn hash_password(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+
+        let mut hashed_password = hash_password(&self.password)?;
+        self.password = hashed_password;
+
+        Ok(())
+    }
+
+    pub fn verify_password(&self, password: &str) -> Result<bool, Box<dyn std::error::Error>> {
+        let is_verified = verify_password(password, &self.password)?;
+
+        Ok(is_verified)
+    }
 }
 
 // User Errors
-#[derive(Debug, Error)]
-pub enum UserError {
-    #[error("User already exists")]
-    UserAlreadyExists,
-    #[error("User not found")]
-    UserNotFound,
-}
