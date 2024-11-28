@@ -7,9 +7,11 @@ use std::{collections::HashMap, error::Error};
 use rusoto_dynamodb::{AttributeValue};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
+use uuid::Uuid;
 
 use crate::utils::hash::{hash_password, verify_password};
 
+// UserErrors 
 #[derive(Debug, Error)]
 pub enum UserError {
     #[error("User already exists")]
@@ -18,6 +20,8 @@ pub enum UserError {
     UserNotFound,
     #[error("DynamoDB Error: {0}")]
     DynamoDBError(String),
+    #[error("Password hash error")]
+    PasswordHashError,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default, )]
@@ -31,6 +35,26 @@ pub struct User {
 }
 
 impl User {
+
+    pub fn new(email: String, username: String, password: String) -> Result<User, UserError> {
+
+        let password = hash_password(&password);
+
+        match password {
+            Ok(password) => return Ok(User {
+                id: Uuid::new_v4().to_string(),
+                email,
+                username,
+                password,
+                created_at: chrono::Utc::now().to_string(),
+                updated_at: chrono::Utc::now().to_string(),
+            }),
+            Err(_) => {
+                return Err(UserError::PasswordHashError)
+            },
+        }
+        
+    }
 
     pub fn to_item(&self) -> HashMap<String, AttributeValue> {
         let mut item = HashMap::new();
@@ -54,10 +78,15 @@ impl User {
         }
     }
 
-    pub fn hash_password(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn hash_password(&mut self) -> Result<(), UserError> {
 
-        let mut hashed_password = hash_password(&self.password)?;
-        self.password = hashed_password;
+        let mut hashed_password = hash_password(&self.password);
+        let password = match hashed_password {
+            Ok(password) => password,
+            Err(_) => return Err(UserError::PasswordHashError),
+        };
+
+        self.password = password;
 
         Ok(())
     }
@@ -69,4 +98,3 @@ impl User {
     }
 }
 
-// User Errors

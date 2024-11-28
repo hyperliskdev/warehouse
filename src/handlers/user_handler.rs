@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, result::Result};
 
 use rusoto_core::RusotoError;
 use rusoto_dynamodb::{AttributeValue, DynamoDb, DynamoDbClient, GetItemInput, PutItemError, PutItemInput};
@@ -8,11 +8,11 @@ use crate::models::user::{User, UserError};
 // Create a new user
 pub async fn create_user(
     db_client: DynamoDbClient,
-     user: &mut User,
-) -> Result<(), Box<dyn std::error::Error>> {
+    user: &mut User,
+) -> Result<(), UserError> {
 
     // Hash the password before trying anything.
-    user.hash_password()?;
+    user.hash_password();
 
     // Create a put_item input
     let item = user.to_item();
@@ -34,15 +34,15 @@ pub async fn create_user(
             // Use match statement for PutItemError
             match e {
                 RusotoError::Service(PutItemError::ConditionalCheckFailed(_)) => {
-                    Err(Box::new(UserError::UserAlreadyExists))
+                    Err(UserError::UserAlreadyExists)
                 }
-                _ => Err(Box::new(e)),
+                _ => Err(UserError::DynamoDBError(e.to_string())),
             }
         }
     }
 }
 
-pub async fn get_user(
+pub async fn get_user_by_email(
     db_client: DynamoDbClient,
     email: String,
 ) -> Result<User, UserError> {
@@ -54,6 +54,44 @@ pub async fn get_user(
                 "email".to_string(),
                 AttributeValue {
                     s: Some(email),
+                    ..Default::default()
+                },
+            );
+            key
+        },
+        table_name: "users".to_string(),
+        ..Default::default()
+    };
+
+    // Get the item from the database
+    match db_client.get_item(input).await {
+        Ok(output) => {
+            // Check if the item exists
+            match output.item {
+                Some(item) => {
+                    // Convert the item to a user
+                    let user = User::from_item(item);
+                    Ok(user)
+                }
+                None => Err(UserError::UserNotFound),
+            }
+        }
+        Err(e) => Err(UserError::DynamoDBError(e.to_string())),
+    }
+}
+
+pub async fn get_user_by_id(
+    db_client: DynamoDbClient,
+    id: String,
+) -> Result<User, UserError> {
+    // Create a get_item input
+    let input = GetItemInput {
+        key: {
+            let mut key = HashMap::new();
+            key.insert(
+                "id".to_string(),
+                AttributeValue {
+                    s: Some(id),
                     ..Default::default()
                 },
             );

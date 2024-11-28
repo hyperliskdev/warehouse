@@ -1,19 +1,12 @@
 // Login route
 
-
-use std::collections::HashMap;
-
-use rusoto_dynamodb::AttributeValue;
-use rusoto_dynamodb::DynamoDb;
 use rusoto_dynamodb::DynamoDbClient;
-use rusoto_dynamodb::GetItemInput;
-use rusoto_dynamodb::QueryInput;
 use serde::Serialize;
 
 use serde::Deserialize;
 use warp::Filter;
 
-use crate::handlers::user_handler::get_user;
+use crate::handlers::user_handler::get_user_by_email;
 use crate::models::user::User;
 use crate::routes::with_db;
 use crate::utils::jwt::generate_token;
@@ -21,12 +14,12 @@ use crate::utils::jwt::generate_token;
 #[derive(Debug, Deserialize)]
 pub struct LoginRequest {
     email: String,
-    password: String
+    password: String,
 }
 
 #[derive(Debug, Serialize)]
 pub struct LoginResponse {
-    warehouse_token: String
+    message: String,
 }
 
 pub fn login(
@@ -43,11 +36,9 @@ async fn login_handler(
     login_req: LoginRequest,
     db_client: DynamoDbClient,
 ) -> Result<impl warp::Reply, warp::Rejection> {
-
-    
-    let user: User = match get_user(db_client, login_req.email).await {
+    let user: User = match get_user_by_email(db_client, login_req.email).await {
         Ok(user) => user,
-        Err(_) => return Err(warp::reject())
+        Err(_) => return Err(warp::reject()),
     };
 
     // Verify password with the hashed password.
@@ -59,12 +50,17 @@ async fn login_handler(
         println!("Password match");
         let token = generate_token(&user.id);
         match token {
+            // Set the authorization header with the token
             Ok(token) => {
-                return Ok(warp::reply::json(&LoginResponse {
-                    warehouse_token: token
-                }))
-            },
-            Err(_) => return Err(warp::reject())
+                return Ok(warp::reply::with_header(
+                    warp::reply::json(&LoginResponse {
+                        message: "User logged in successfully.".to_string(),
+                    }),
+                    "warehouse-token",
+                    token,
+                ));
+            }
+            Err(_) => return Err(warp::reject()),
         }
     }
 }

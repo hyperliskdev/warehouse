@@ -31,6 +31,7 @@ pub fn generate_token(user_id: &str) -> Result<String, jsonwebtoken::errors::Err
     encode(&Header::default(), &claims, &EncodingKey::from_secret(&secret()))
 }
 
+// This only returns the claims, not the if the token is valid.
 pub fn validate_token(token: &str) -> Result<Claims, jsonwebtoken::errors::Error> {
     decode::<Claims>(&token, &DecodingKey::from_secret(&secret()), &Default::default())
         .map(|data| data.claims)

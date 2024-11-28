@@ -3,9 +3,9 @@ use serde::{Deserialize, Serialize};
 use warp::Filter;
 
 use crate::{
-    handlers::user_handler::{create_user, get_user},
-    models::user::UserError,
-    routes::with_db,
+    handlers::user_handler::{create_user, get_user_by_email},
+    models::user::{User, UserError},
+    routes::with_db, utils::jwt::generate_token,
 };
 
 #[derive(Debug, Deserialize)]
@@ -39,7 +39,7 @@ async fn register_handler(
     // If the user exists, return an error
     // If the user does not exist, create the user
     // Return a success message
-    let user = get_user(db_client.clone(), register_req.email.clone()).await;
+    let user = get_user_by_email(db_client.clone(), register_req.email.clone()).await;
 
     match user {
         Ok(_) => {
@@ -50,20 +50,28 @@ async fn register_handler(
             // If the user is not found, create the user
             match e {
                 UserError::UserNotFound => {
-                    let mut user = crate::models::user::User {
-                        id: uuid::Uuid::new_v4().to_string(),
-                        email: register_req.email.clone(),
-                        username: register_req.username.clone(),
-                        password: register_req.password.clone(),
-                        created_at: chrono::Utc::now().to_string(),
-                        updated_at: chrono::Utc::now().to_string(),
-                    };
+                    let mut user = User::new(
+                        register_req.email,
+                        register_req.username,
+                        register_req.password
+                    ).unwrap();
+
+                    let token = generate_token(&user.id);
 
                     match create_user(db_client.clone(), &mut user).await {
                         Ok(_) => {
-                            return Ok(warp::reply::json(&RegisterResponse {
-                                message: "User created successfully".to_string(),
-                            }));
+                            match token {
+                                Ok(token) => {
+                                    return Ok(
+                                        warp::reply::with_header(warp::reply::json(
+                                            &RegisterResponse {
+                                                message: "User registered successfuly.".to_string(),
+                                            }
+                                        ), "warehouse-token", token)
+                                    );
+                                },
+                                Err(_) => return Err(warp::reject()),
+                            }
                         }
                         Err(_) => {
                             return Err(warp::reject());

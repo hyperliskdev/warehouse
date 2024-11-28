@@ -15,13 +15,16 @@ pub fn with_db(
     warp::any().map(move || db_client.clone())
 }
 
+pub fn with_s3(
+    s3_client: S3Client,
+) -> impl Filter<Extract = (S3Client,), Error = std::convert::Infallible> + Clone {
+    warp::any().map(move || s3_client.clone())
+}
+
 pub fn api(
     db_client: DynamoDbClient,
     s3_client: S3Client,
 ) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
-
-    let db_filter = warp::any().map(move || db_client.clone());
-    let s3_filter = warp::any().map(move || s3_client.clone());
 
     // Health route defined by default.
     let health_route = warp::path!("health").and(warp::get()).and_then(health::health);
